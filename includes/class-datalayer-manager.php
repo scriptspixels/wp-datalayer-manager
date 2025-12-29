@@ -22,6 +22,10 @@ class DataLayer_Manager {
         // Register admin menu.
         add_action( 'admin_menu', array( $this, 'register_admin_menu' ) );
         
+        // Register meta boxes for premium features.
+        add_action( 'add_meta_boxes', array( $this, 'register_meta_boxes' ) );
+        add_action( 'save_post', array( $this, 'save_meta_box' ), 10, 2 );
+        
         // Frontend injection.
         add_action( 'wp_head', array( $this, 'inject_datalayer' ), 1 );
     }
@@ -816,6 +820,443 @@ class DataLayer_Manager {
     }
 
     /**
+     * Register meta boxes for posts and pages.
+     */
+    public function register_meta_boxes() {
+        // Add meta box to posts and pages.
+        $post_types = array( 'post', 'page' );
+        
+        // Allow filtering to add custom post types.
+        $post_types = apply_filters( 'datalayer_manager_meta_box_post_types', $post_types );
+        
+        foreach ( $post_types as $post_type ) {
+            add_meta_box(
+                'datalayer-manager-variables',
+                __( 'DataLayer Variables', 'datalayer-manager' ),
+                array( $this, 'render_meta_box' ),
+                $post_type,
+                'side',
+                'default'
+            );
+        }
+    }
+
+    /**
+     * Render the meta box content.
+     *
+     * @param WP_Post $post The post object.
+     */
+    public function render_meta_box( $post ) {
+        // Add nonce for security.
+        wp_nonce_field( 'datalayer_manager_meta_box', 'datalayer_manager_meta_box_nonce' );
+        
+        // Get custom variables from post meta.
+        $custom_variables = get_post_meta( $post->ID, '_datalayer_manager_custom_variables', true );
+        if ( ! is_array( $custom_variables ) ) {
+            $custom_variables = array();
+        }
+        
+        // Get auto-detected variable keys that are reserved/uneditable.
+        $auto_detected_keys = $this->get_auto_detected_variable_keys( $post );
+        
+        // Get preview of auto-detected variables with their values.
+        $auto_detected_variables = $this->get_auto_detected_variables_preview( $post );
+        
+        // Filter out custom variables that match auto-detected keys (they shouldn't exist, but clean up if they do).
+        $filtered_custom_variables = array();
+        foreach ( $custom_variables as $key => $value ) {
+            if ( ! in_array( $key, $auto_detected_keys, true ) ) {
+                $filtered_custom_variables[ $key ] = $value;
+            }
+        }
+        
+        ?>
+        <div class="datalayer-manager-meta-box">
+
+            <?php if ( ! empty( $auto_detected_variables ) ) : ?>
+                <div style="margin-bottom: 10px; padding-bottom: 15px; border-bottom: 1px solid #ddd;">
+                    <p>
+                        <strong><?php esc_html_e( 'Auto-Detected Variables', 'datalayer-manager' ); ?></strong>
+                    </p>
+                    <p class="description" style="font-size: 12px; margin-top: 5px;">
+                        <?php esc_html_e( 'These variables are automatically detected and locked. They cannot be modified.', 'datalayer-manager' ); ?>
+                    </p>
+                    <div style="background: #f5f5f5; padding: 10px; margin-top: 10px; border-radius: 3px; max-height: 200px; overflow-y: auto;">
+                        <table style="width: 100%; border-collapse: collapse; font-size: 12px;">
+                            <?php foreach ( $auto_detected_variables as $key => $value ) : ?>
+                                <tr style="border-bottom: 1px solid #ddd;">
+                                    <td style="padding: 6px 8px; width: 35%; vertical-align: top;">
+                                        <code style="color: #666; font-weight: bold;"><?php echo esc_html( $key ); ?></code>
+                                    </td>
+                                    <td style="padding: 6px 8px; vertical-align: top;">
+                                        <span style="color: #333;"><?php echo esc_html( $this->format_value_for_display( $value ) ); ?></span>
+                                    </td>
+                                    <td style="padding: 6px 8px; width: 15%; vertical-align: top;">
+                                        <span style="color: #666; font-size: 11px;"><?php echo esc_html( $this->get_value_type( $value ) ); ?></span>
+                                    </td>
+                                </tr>
+                            <?php endforeach; ?>
+                        </table>
+                    </div>
+                </div>
+            <?php endif; ?>
+            <p style="margin-top: 20px;">
+                <strong><?php esc_html_e( 'Custom Variables', 'datalayer-manager' ); ?></strong>
+            </p>
+            <p class="description">
+                <?php esc_html_e( 'Add custom dataLayer variables that will merge with auto-detected variables for this page.', 'datalayer-manager' ); ?>
+            </p>
+            
+            <div id="datalayer-custom-variables">
+                <?php if ( ! empty( $filtered_custom_variables ) ) : ?>
+                    <?php $index = 0; ?>
+                    <?php foreach ( $filtered_custom_variables as $key => $value ) : ?>
+                        <?php
+                        $type = $this->get_value_type( $value );
+                        $display_value = $this->format_value_for_edit( $value, $type );
+                        ?>
+                        <div class="datalayer-variable-row" style="margin-bottom: 10px;">
+                            <label style="display: block; margin-bottom: 3px;">
+                                <strong><?php esc_html_e( 'Name:', 'datalayer-manager' ); ?></strong>
+                                <input type="text" name="datalayer_variables[<?php echo esc_attr( $index ); ?>][key]" value="<?php echo esc_attr( $key ); ?>" class="widefat datalayer-variable-key" pattern="[A-Za-z0-9_]+" required />
+                            </label>
+                            <label style="display: block; margin-bottom: 3px;">
+                                <strong><?php esc_html_e( 'Value:', 'datalayer-manager' ); ?></strong>
+                                <input type="text" name="datalayer_variables[<?php echo esc_attr( $index ); ?>][value]" value="<?php echo esc_attr( $display_value ); ?>" class="widefat" required />
+                            </label>
+                            <label style="display: block; margin-bottom: 3px;">
+                                <strong><?php esc_html_e( 'Type:', 'datalayer-manager' ); ?></strong>
+                                <select style="padding-right: initial;" name="datalayer_variables[<?php echo esc_attr( $index ); ?>][type]" class="widefat">
+                                    <option value="string" <?php selected( $type, 'string' ); ?>><?php esc_html_e( 'String', 'datalayer-manager' ); ?></option>
+                                    <option value="number" <?php selected( $type, 'number' ); ?>><?php esc_html_e( 'Number', 'datalayer-manager' ); ?></option>
+                                    <option value="boolean" <?php selected( $type, 'boolean' ); ?>><?php esc_html_e( 'Boolean', 'datalayer-manager' ); ?></option>
+                                </select>
+                            </label>
+                            <button type="button" class="button button-small remove-variable-row" style="margin-top: 5px;"><?php esc_html_e( 'Remove', 'datalayer-manager' ); ?></button>
+                        </div>
+                        <?php $index++; ?>
+                    <?php endforeach; ?>
+                <?php endif; ?>
+            </div>
+            
+            <button type="button" class="button button-secondary" id="add-datalayer-variable" style="margin-top: 10px;">
+                <?php esc_html_e( '+ Add Variable', 'datalayer-manager' ); ?>
+            </button>
+            
+            <input type="hidden" id="datalayer-auto-detected-keys" value="<?php echo esc_attr( wp_json_encode( $auto_detected_keys ) ); ?>" />
+        </div>
+        
+        <script type="text/javascript">
+        (function($) {
+            $(document).ready(function() {
+                var autoDetectedKeys = [];
+                try {
+                    autoDetectedKeys = JSON.parse($('#datalayer-auto-detected-keys').val() || '[]');
+                } catch(e) {
+                    autoDetectedKeys = [];
+                }
+                
+                // Validate key against auto-detected keys.
+                function validateVariableKey(key, inputElement) {
+                    if (autoDetectedKeys.indexOf(key) !== -1) {
+                        inputElement.css('border-color', '#dc3232');
+                        var errorMsg = inputElement.siblings('.datalayer-error-message');
+                        if (errorMsg.length === 0) {
+                            inputElement.after('<span class="datalayer-error-message" style="color: #dc3232; font-size: 11px; display: block; margin-top: 3px;"><?php echo esc_js( __( 'This key is reserved for auto-detected variables and cannot be used.', 'datalayer-manager' ) ); ?></span>');
+                        }
+                        return false;
+                    } else {
+                        inputElement.css('border-color', '');
+                        inputElement.siblings('.datalayer-error-message').remove();
+                        return true;
+                    }
+                }
+                
+                // Add variable row.
+                $('#add-datalayer-variable').on('click', function() {
+                    var index = Date.now();
+                    var row = '<div class="datalayer-variable-row" style="margin-bottom: 10px;">' +
+                        '<label style="display: block; margin-bottom: 3px;">' +
+                        '<strong><?php echo esc_js( __( 'Name:', 'datalayer-manager' ) ); ?></strong>' +
+                        '<input type="text" name="datalayer_variables[' + index + '][key]" value="" class="widefat datalayer-variable-key" pattern="[A-Za-z0-9_]+" required />' +
+                        '</label>' +
+                        '<label style="display: block; margin-bottom: 3px;">' +
+                        '<strong><?php echo esc_js( __( 'Value:', 'datalayer-manager' ) ); ?></strong>' +
+                        '<input type="text" name="datalayer_variables[' + index + '][value]" value="" class="widefat" required />' +
+                        '</label>' +
+                        '<label style="display: block; margin-bottom: 3px;">' +
+                        '<strong><?php echo esc_js( __( 'Type:', 'datalayer-manager' ) ); ?></strong>' +
+                        '<select name="datalayer_variables[' + index + '][type]" class="widefat">' +
+                        '<option value="string"><?php echo esc_js( __( 'String', 'datalayer-manager' ) ); ?></option>' +
+                        '<option value="number"><?php echo esc_js( __( 'Number', 'datalayer-manager' ) ); ?></option>' +
+                        '<option value="boolean"><?php echo esc_js( __( 'Boolean', 'datalayer-manager' ) ); ?></option>' +
+                        '</select>' +
+                        '</label>' +
+                        '<button type="button" class="button button-small remove-variable-row" style="margin-top: 5px;"><?php echo esc_js( __( 'Remove', 'datalayer-manager' ) ); ?></button>' +
+                        '</div>';
+                    $('#datalayer-custom-variables').append(row);
+                });
+                
+                // Validate on key input.
+                $(document).on('blur', '.datalayer-variable-key', function() {
+                    var key = $(this).val().trim();
+                    if (key) {
+                        validateVariableKey(key, $(this));
+                    }
+                });
+                
+                // Remove variable row.
+                $(document).on('click', '.remove-variable-row', function() {
+                    $(this).closest('.datalayer-variable-row').remove();
+                });
+            });
+        })(jQuery);
+        </script>
+        <?php
+    }
+
+    /**
+     * Save meta box data.
+     *
+     * @param int     $post_id Post ID.
+     * @param WP_Post $post    Post object.
+     */
+    public function save_meta_box( $post_id, $post ) {
+        // Check if nonce is set.
+        if ( ! isset( $_POST['datalayer_manager_meta_box_nonce'] ) ) {
+            return;
+        }
+
+        // Verify nonce.
+        if ( ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['datalayer_manager_meta_box_nonce'] ) ), 'datalayer_manager_meta_box' ) ) {
+            return;
+        }
+
+        // Check if autosave.
+        if ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE ) {
+            return;
+        }
+
+        // Check user permissions.
+        if ( ! current_user_can( 'edit_post', $post_id ) ) {
+            return;
+        }
+
+        // Check post type.
+        $allowed_types = apply_filters( 'datalayer_manager_meta_box_post_types', array( 'post', 'page' ) );
+        if ( ! in_array( $post->post_type, $allowed_types, true ) ) {
+            return;
+        }
+
+        // Get auto-detected variable keys (to prevent overriding).
+        $auto_detected_keys = $this->get_auto_detected_variable_keys( $post );
+
+        // Process custom variables.
+        $custom_variables = array();
+        
+        if ( isset( $_POST['datalayer_variables'] ) && is_array( $_POST['datalayer_variables'] ) ) {
+            foreach ( $_POST['datalayer_variables'] as $var ) {
+                $key = isset( $var['key'] ) ? trim( sanitize_text_field( wp_unslash( $var['key'] ) ) ) : '';
+                $value = isset( $var['value'] ) ? trim( sanitize_text_field( wp_unslash( $var['value'] ) ) ) : '';
+                $type = isset( $var['type'] ) ? sanitize_text_field( wp_unslash( $var['type'] ) ) : 'string';
+
+                // Skip if key is empty.
+                if ( empty( $key ) ) {
+                    continue;
+                }
+
+                // Validate key format.
+                if ( ! preg_match( '/^[A-Za-z0-9_]+$/', $key ) ) {
+                    continue;
+                }
+
+                // Prevent using auto-detected variable keys.
+                if ( in_array( $key, $auto_detected_keys, true ) ) {
+                    continue; // Skip this variable - it's reserved.
+                }
+
+                // Convert value by type.
+                $converted_value = $this->convert_value_by_type( $value, $type );
+                if ( null !== $converted_value ) {
+                    $custom_variables[ $key ] = $converted_value;
+                }
+            }
+        }
+
+        // Save custom variables.
+        if ( ! empty( $custom_variables ) ) {
+            update_post_meta( $post_id, '_datalayer_manager_custom_variables', $custom_variables );
+        } else {
+            delete_post_meta( $post_id, '_datalayer_manager_custom_variables' );
+        }
+    }
+
+    /**
+     * Convert value by type.
+     *
+     * @param string $value Value to convert.
+     * @param string $type  Target type.
+     * @return mixed Converted value or null if invalid.
+     */
+    private function convert_value_by_type( $value, $type ) {
+        switch ( $type ) {
+            case 'number':
+                if ( ! is_numeric( $value ) ) {
+                    return null;
+                }
+                return strpos( $value, '.' ) !== false ? (float) $value : (int) $value;
+
+            case 'boolean':
+                $lower_value = strtolower( trim( $value ) );
+                if ( 'true' === $lower_value || '1' === $lower_value || 'yes' === $lower_value ) {
+                    return true;
+                } elseif ( 'false' === $lower_value || '0' === $lower_value || 'no' === $lower_value || '' === $lower_value ) {
+                    return false;
+                }
+                return null;
+
+            case 'string':
+            default:
+                return $value;
+        }
+    }
+
+    /**
+     * Format value for editing (convert back to string for form input).
+     *
+     * @param mixed  $value Value to format.
+     * @param string $type  Type of value.
+     * @return string Formatted value for form input.
+     */
+    private function format_value_for_edit( $value, $type ) {
+        if ( 'boolean' === $type ) {
+            return $value ? 'true' : 'false';
+        }
+        return (string) $value;
+    }
+
+    /**
+     * Get auto-detected variable keys for a specific post (uneditable/reserved).
+     *
+     * @param WP_Post $post Post object.
+     * @return array Array of reserved variable keys.
+     */
+    private function get_auto_detected_variable_keys( $post ) {
+        $variables = $this->get_auto_detected_variables_preview( $post );
+        return array_keys( $variables );
+    }
+
+    /**
+     * Get preview of auto-detected variables with their values for a specific post.
+     * This simulates what would be detected on the frontend.
+     *
+     * @param WP_Post $post Post object.
+     * @return array Array of auto-detected variables with keys and values.
+     */
+    private function get_auto_detected_variables_preview( $post ) {
+        $variables = array();
+        
+        // Common variables (always present).
+        if ( 'post' === $post->post_type ) {
+            $variables['pageType'] = 'post';
+            $variables['postType'] = $post->post_type;
+            $variables['postId'] = $post->ID;
+            $variables['postTitle'] = get_the_title( $post );
+            
+            // Post categories.
+            $categories = get_the_category( $post->ID );
+            if ( ! empty( $categories ) ) {
+                $variables['postCategory'] = array();
+                foreach ( $categories as $cat ) {
+                    $variables['postCategory'][] = $cat->name;
+                }
+            }
+            
+            // Post tags.
+            $tags = get_the_tags( $post->ID );
+            if ( ! empty( $tags ) ) {
+                $variables['postTags'] = array();
+                foreach ( $tags as $tag ) {
+                    $variables['postTags'][] = $tag->name;
+                }
+            }
+        } elseif ( 'page' === $post->post_type ) {
+            $variables['pageType'] = 'page';
+            $variables['pageId'] = $post->ID;
+            $variables['pageTitle'] = get_the_title( $post );
+            $variables['pageSlug'] = $post->post_name;
+        }
+        
+        // WooCommerce variables (if WooCommerce is active and this is a product).
+        if ( $this->is_woocommerce_active() && 'product' === $post->post_type ) {
+            $product = wc_get_product( $post->ID );
+            if ( $product && is_a( $product, 'WC_Product' ) ) {
+                $variables['pageType'] = 'product';
+                $variables['productId'] = $product->get_id();
+                $variables['productName'] = $product->get_name();
+                $variables['productSku'] = $product->get_sku();
+                $variables['productPrice'] = (float) $product->get_price();
+                $variables['productRegularPrice'] = (float) $product->get_regular_price();
+                $sale_price = $product->get_sale_price();
+                $variables['productSalePrice'] = $sale_price ? (float) $sale_price : null;
+                $variables['productStockStatus'] = $product->get_stock_status();
+                $variables['productStockQuantity'] = $product->get_stock_quantity();
+                $variables['productType'] = $product->get_type();
+                $variables['productOnSale'] = $product->is_on_sale();
+                
+                // Product categories.
+                $product_categories = wp_get_post_terms( $product->get_id(), 'product_cat', array( 'fields' => 'names' ) );
+                if ( ! empty( $product_categories ) && ! is_wp_error( $product_categories ) ) {
+                    $variables['productCategory'] = $product_categories;
+                }
+                
+                // Product tags.
+                $product_tags = wp_get_post_terms( $product->get_id(), 'product_tag', array( 'fields' => 'names' ) );
+                if ( ! empty( $product_tags ) && ! is_wp_error( $product_tags ) ) {
+                    $variables['productTag'] = $product_tags;
+                }
+                
+                // Product brand (if WooCommerce Brands plugin is active).
+                if ( taxonomy_exists( 'product_brand' ) ) {
+                    $product_brands = wp_get_post_terms( $product->get_id(), 'product_brand', array( 'fields' => 'names' ) );
+                    if ( ! empty( $product_brands ) && ! is_wp_error( $product_brands ) ) {
+                        $variables['productBrand'] = $product_brands;
+                    }
+                }
+            }
+        }
+        
+        // User information.
+        if ( is_user_logged_in() ) {
+            $current_user = wp_get_current_user();
+            $variables['userId'] = $current_user->ID;
+            $variables['userLoggedIn'] = true;
+        } else {
+            $variables['userLoggedIn'] = false;
+        }
+        
+        // Site information (always present).
+        $variables['siteName'] = get_bloginfo( 'name' );
+        $variables['siteUrl'] = home_url();
+        
+        return $variables;
+    }
+
+    /**
+     * Get custom variables for a specific post.
+     *
+     * @param int $post_id Post ID.
+     * @return array Custom variables array.
+     */
+    private function get_custom_variables( $post_id ) {
+        $custom_variables = get_post_meta( $post_id, '_datalayer_manager_custom_variables', true );
+        if ( ! is_array( $custom_variables ) ) {
+            return array();
+        }
+        return $custom_variables;
+    }
+
+    /**
      * Inject dataLayer script into frontend head.
      * Auto-detects WordPress context and builds dataLayer automatically.
      */
@@ -827,6 +1268,21 @@ class DataLayer_Manager {
 
         // Auto-detect WordPress context and build variables.
         $variables = $this->get_automatic_datalayer_variables();
+
+        // Get custom variables for current post/page (if on singular page).
+        if ( is_singular() ) {
+            $post_id = get_queried_object_id();
+            $custom_variables = $this->get_custom_variables( $post_id );
+            
+            // Merge custom variables with auto-detected ones (custom overrides auto).
+            if ( ! empty( $custom_variables ) ) {
+                $variables = array_merge( $variables, $custom_variables );
+                
+                if ( $this->is_debug_mode() ) {
+                    echo "<!-- DataLayer Manager: Merged " . esc_html( count( $custom_variables ) ) . " custom variables -->\n";
+                }
+            }
+        }
 
         if ( empty( $variables ) ) {
             // No variables - fail safely, do nothing.

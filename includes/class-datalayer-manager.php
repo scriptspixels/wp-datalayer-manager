@@ -86,43 +86,116 @@ class DataLayer_Manager {
         <div class="wrap">
             <h1><?php echo esc_html( get_admin_page_title() ); ?></h1>
 
-            <div class="datalayer-manager-status">
-                <h2><?php esc_html_e( 'Current Status', 'datalayer-manager' ); ?></h2>
-                <p>
-                    <strong><?php esc_html_e( 'Auto-Detection Active', 'datalayer-manager' ); ?></strong>
-                </p>
-                <p>
-                    <?php esc_html_e( 'DataLayer variables are automatically detected from WordPress context and injected on the frontend.', 'datalayer-manager' ); ?>
-                </p>
-
-                <h3><?php esc_html_e( 'WordPress Default Variables', 'datalayer-manager' ); ?></h3>
-                <p>
-                    <?php esc_html_e( 'The following WordPress variables can be automatically detected:', 'datalayer-manager' ); ?>
-                </p>
-                <table class="wp-list-table widefat fixed striped">
-                    <thead>
-                        <tr>
-                            <th scope="col" style="width: 25%;"><?php esc_html_e( 'Variable Name', 'datalayer-manager' ); ?></th>
-                            <th scope="col" style="width: 20%;"><?php esc_html_e( 'Type', 'datalayer-manager' ); ?></th>
-                            <th scope="col" style="width: 55%;"><?php esc_html_e( 'Description', 'datalayer-manager' ); ?></th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php foreach ( $wordpress_variables as $var ) : ?>
-                            <tr>
-                                <td><strong><code><?php echo esc_html( $var['name'] ); ?></code></strong></td>
-                                <td><?php echo esc_html( $var['type'] ); ?></td>
-                                <td><?php echo esc_html( $var['description'] ); ?></td>
-                            </tr>
-                        <?php endforeach; ?>
-                    </tbody>
-                </table>
-
+            <div class="datalayer-manager-status" style="max-width: 1200px;">
                 
-                <?php if ( $this->is_woocommerce_active() ) : ?>
-                    <h3><?php esc_html_e( 'WooCommerce Variables', 'datalayer-manager' ); ?></h3>
+                <!-- Introduction Section -->
+                <div style="background: #fff; border: 1px solid #ccd0d4; box-shadow: 0 1px 1px rgba(0,0,0,.04); padding: 20px; margin: 20px 0;">
+                    <h2 style="margin-top: 0;"><?php esc_html_e( 'What is DataLayer Manager?', 'datalayer-manager' ); ?></h2>
+                    <p style="font-size: 15px; line-height: 1.6;">
+                        <?php esc_html_e( 'DataLayer Manager automatically creates and manages a dataLayer object for your WordPress site. This object contains structured data about your pages, posts, products, and user interactions that can be used by analytics tools like Google Tag Manager (GTM) and Google Analytics 4 (GA4).', 'datalayer-manager' ); ?>
+                    </p>
+                    <p style="font-size: 15px; line-height: 1.6;">
+                        <strong><?php esc_html_e( 'No coding required!', 'datalayer-manager' ); ?></strong>
+                        <?php esc_html_e( 'The plugin automatically detects WordPress and WooCommerce data and injects it into the dataLayer on every page. You can also add custom variables on a per-page basis using the editor.', 'datalayer-manager' ); ?>
+                    </p>
+                </div>
+
+                <!-- Current Status Section -->
+                <div style="background: #fff; border: 1px solid #ccd0d4; box-shadow: 0 1px 1px rgba(0,0,0,.04); padding: 20px; margin: 20px 0;">
+                    <h2 style="margin-top: 0;"><?php esc_html_e( 'Current Status', 'datalayer-manager' ); ?></h2>
+                    <p style="font-size: 14px; padding: 10px; background: #d4edda; border-left: 4px solid #28a745; margin: 10px 0;">
+                        <strong style="color: #155724;">✓ <?php esc_html_e( 'Auto-Detection Active', 'datalayer-manager' ); ?></strong><br>
+                        <?php esc_html_e( 'DataLayer variables are being automatically detected and injected on all frontend pages.', 'datalayer-manager' ); ?>
+                    </p>
+                </div>
+
+                <!-- Where to Find Variables Section -->
+                <div style="background: #fff; border: 1px solid #ccd0d4; box-shadow: 0 1px 1px rgba(0,0,0,.04); padding: 20px; margin: 20px 0;">
+                    <h2 style="margin-top: 0;"><?php esc_html_e( 'Where to Find DataLayer Variables', 'datalayer-manager' ); ?></h2>
+                    
+                    <h3><?php esc_html_e( '1. View Variables on the Frontend (Browser Console)', 'datalayer-manager' ); ?></h3>
+                    <p><?php esc_html_e( 'To see what variables are being detected on any page:', 'datalayer-manager' ); ?></p>
+                    <ol style="line-height: 1.8;">
+                        <li>
+                            <?php esc_html_e( 'Visit any page on your website (frontend, not admin)', 'datalayer-manager' ); ?>
+                        </li>
+                        <li>
+                            <?php esc_html_e( 'Open your browser\'s Developer Tools:', 'datalayer-manager' ); ?>
+                            <ul style="list-style-type: disc; margin-left: 30px; margin-top: 5px;">
+                                <li><?php esc_html_e( 'Chrome/Edge: Press F12 or right-click → Inspect', 'datalayer-manager' ); ?></li>
+                                <li><?php esc_html_e( 'Firefox: Press F12 or right-click → Inspect Element', 'datalayer-manager' ); ?></li>
+                                <li><?php esc_html_e( 'Safari: Enable Developer menu in Preferences → Advanced, then press Cmd+Option+I', 'datalayer-manager' ); ?></li>
+                            </ul>
+                        </li>
+                        <li>
+                            <?php esc_html_e( 'Go to the Console tab', 'datalayer-manager' ); ?>
+                        </li>
+                        <li>
+                            <?php esc_html_e( 'Type the following command and press Enter:', 'datalayer-manager' ); ?>
+                            <div style="background: #f5f5f5; border: 1px solid #ddd; padding: 12px; margin: 10px 0; font-family: 'Courier New', monospace; border-radius: 4px;">
+                                <code style="font-size: 14px;">window.dataLayer</code>
+                            </div>
+                        </li>
+                        <li>
+                            <?php esc_html_e( 'You should see an array containing all the detected variables for the current page. Expand it to see individual variables and their values.', 'datalayer-manager' ); ?>
+                        </li>
+                    </ol>
+                    <p style="padding: 10px; background: #fff3cd; border-left: 4px solid #ffc107; margin: 15px 0;">
+                        <strong><?php esc_html_e( 'Tip:', 'datalayer-manager' ); ?></strong>
+                        <?php esc_html_e( 'You can also use', 'datalayer-manager' ); ?> <code>window.dataLayer[0]</code> <?php esc_html_e( 'to see just the first (most recent) dataLayer push.', 'datalayer-manager' ); ?>
+                    </p>
+
+                    <h3><?php esc_html_e( '2. Add Custom Variables (Premium Feature)', 'datalayer-manager' ); ?></h3>
+                    <p><?php esc_html_e( 'To add custom variables for a specific page, post, or product:', 'datalayer-manager' ); ?></p>
+                    <ol style="line-height: 1.8;">
+                        <li>
+                            <?php esc_html_e( 'Go to any post, page, or product edit screen in WordPress admin', 'datalayer-manager' ); ?>
+                        </li>
+                        <li>
+                            <?php esc_html_e( 'Scroll down to the bottom of the editor', 'datalayer-manager' ); ?>
+                        </li>
+                        <li>
+                            <?php esc_html_e( 'Look for the "DataLayer Variables" section (it may be collapsed - click to expand)', 'datalayer-manager' ); ?>
+                        </li>
+                        <li>
+                            <?php esc_html_e( 'You\'ll see two sections:', 'datalayer-manager' ); ?>
+                            <ul style="list-style-type: disc; margin-left: 30px; margin-top: 5px;">
+                                <li>
+                                    <strong><?php esc_html_e( 'Auto-Detected Variables:', 'datalayer-manager' ); ?></strong>
+                                    <?php esc_html_e( 'These are automatically detected and cannot be edited. They show what variables will be available on this page.', 'datalayer-manager' ); ?>
+                                </li>
+                                <li>
+                                    <strong><?php esc_html_e( 'Custom Variables:', 'datalayer-manager' ); ?></strong>
+                                    <?php esc_html_e( 'Add your own custom variables here. These will be merged with the auto-detected variables on the frontend.', 'datalayer-manager' ); ?>
+                                </li>
+                            </ul>
+                        </li>
+                        <li>
+                            <?php esc_html_e( 'Click "+ Add Variable" to add a new custom variable', 'datalayer-manager' ); ?>
+                        </li>
+                        <li>
+                            <?php esc_html_e( 'Enter a variable name (key), value, and select the type (string, number, or boolean)', 'datalayer-manager' ); ?>
+                        </li>
+                        <li>
+                            <?php esc_html_e( 'Save or update your post/page/product to save the custom variables', 'datalayer-manager' ); ?>
+                        </li>
+                    </ol>
+                    <p style="padding: 10px; background: #e7f3ff; border-left: 4px solid #2271b1; margin: 15px 0;">
+                        <strong><?php esc_html_e( 'Note:', 'datalayer-manager' ); ?></strong>
+                        <?php esc_html_e( 'Custom variable names cannot match auto-detected variable names. The plugin will prevent you from using reserved names.', 'datalayer-manager' ); ?>
+                    </p>
+                </div>
+
+                <!-- Available Variables Section -->
+                <div style="background: #fff; border: 1px solid #ccd0d4; box-shadow: 0 1px 1px rgba(0,0,0,.04); padding: 20px; margin: 20px 0;">
+                    <h2 style="margin-top: 0;"><?php esc_html_e( 'Available Auto-Detected Variables', 'datalayer-manager' ); ?></h2>
                     <p>
-                        <?php esc_html_e( 'The following WooCommerce variables can be automatically detected when WooCommerce is active:', 'datalayer-manager' ); ?>
+                        <?php esc_html_e( 'The following variables are automatically detected based on the page type and WordPress context. No configuration needed!', 'datalayer-manager' ); ?>
+                    </p>
+
+                    <h3><?php esc_html_e( 'WordPress Default Variables', 'datalayer-manager' ); ?></h3>
+                    <p>
+                        <?php esc_html_e( 'These variables are available on all WordPress sites:', 'datalayer-manager' ); ?>
                     </p>
                     <table class="wp-list-table widefat fixed striped">
                         <thead>
@@ -133,7 +206,7 @@ class DataLayer_Manager {
                             </tr>
                         </thead>
                         <tbody>
-                            <?php foreach ( $woocommerce_variables as $var ) : ?>
+                            <?php foreach ( $wordpress_variables as $var ) : ?>
                                 <tr>
                                     <td><strong><code><?php echo esc_html( $var['name'] ); ?></code></strong></td>
                                     <td><?php echo esc_html( $var['type'] ); ?></td>
@@ -142,49 +215,55 @@ class DataLayer_Manager {
                             <?php endforeach; ?>
                         </tbody>
                     </table>
-                <?php else : ?>
-                    <div class="notice notice-info">
-                        <p>
-                            <?php esc_html_e( 'WooCommerce is not currently active. Install and activate WooCommerce to enable e-commerce variable detection (product pricing, cart totals, checkout information, etc.).', 'datalayer-manager' ); ?>
-                        </p>
-                    </div>
-                <?php endif; ?>
 
-                <h3><?php esc_html_e( 'How It Works', 'datalayer-manager' ); ?></h3>
-                <p>
-                    <?php esc_html_e( 'Variables are automatically detected from WordPress context (page type, post info, categories, etc.) and injected into window.dataLayer on the frontend using the .push() method. No configuration needed - it works automatically.', 'datalayer-manager' ); ?>
-                </p>
-                
-                <h4><?php esc_html_e( 'How to View the DataLayer in Your Browser', 'datalayer-manager' ); ?></h4>
-                <ol>
-                    <li>
-                        <?php esc_html_e( 'Visit any page on your website (frontend, not admin)', 'datalayer-manager' ); ?>
-                    </li>
-                    <li>
-                        <?php esc_html_e( 'Open your browser\'s Developer Tools:', 'datalayer-manager' ); ?>
-                        <ul style="list-style-type: disc; margin-left: 20px; margin-top: 5px;">
-                            <li><?php esc_html_e( 'Chrome/Edge: Press F12 or right-click → Inspect', 'datalayer-manager' ); ?></li>
-                            <li><?php esc_html_e( 'Firefox: Press F12 or right-click → Inspect Element', 'datalayer-manager' ); ?></li>
-                            <li><?php esc_html_e( 'Safari: Enable Developer menu in Preferences → Advanced, then press Cmd+Option+I', 'datalayer-manager' ); ?></li>
-                        </ul>
-                    </li>
-                    <li>
-                        <?php esc_html_e( 'Go to the Console tab', 'datalayer-manager' ); ?>
-                    </li>
-                    <li>
-                        <?php esc_html_e( 'Type the following command and press Enter:', 'datalayer-manager' ); ?>
-                        <div style="background: #f5f5f5; border: 1px solid #ddd; padding: 10px; margin: 10px 0; font-family: monospace;">
-                            <code>window.dataLayer</code>
+                    <?php if ( $this->is_woocommerce_active() ) : ?>
+                        <h3 style="margin-top: 30px;"><?php esc_html_e( 'WooCommerce Variables', 'datalayer-manager' ); ?></h3>
+                        <p>
+                            <?php esc_html_e( 'These additional variables are available when WooCommerce is active:', 'datalayer-manager' ); ?>
+                        </p>
+                        <table class="wp-list-table widefat fixed striped">
+                            <thead>
+                                <tr>
+                                    <th scope="col" style="width: 25%;"><?php esc_html_e( 'Variable Name', 'datalayer-manager' ); ?></th>
+                                    <th scope="col" style="width: 20%;"><?php esc_html_e( 'Type', 'datalayer-manager' ); ?></th>
+                                    <th scope="col" style="width: 55%;"><?php esc_html_e( 'Description', 'datalayer-manager' ); ?></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php foreach ( $woocommerce_variables as $var ) : ?>
+                                    <tr>
+                                        <td><strong><code><?php echo esc_html( $var['name'] ); ?></code></strong></td>
+                                        <td><?php echo esc_html( $var['type'] ); ?></td>
+                                        <td><?php echo esc_html( $var['description'] ); ?></td>
+                                    </tr>
+                                <?php endforeach; ?>
+                            </tbody>
+                        </table>
+                    <?php else : ?>
+                        <div class="notice notice-info" style="margin-top: 20px;">
+                            <p>
+                                <strong><?php esc_html_e( 'WooCommerce Not Active', 'datalayer-manager' ); ?></strong><br>
+                                <?php esc_html_e( 'Install and activate WooCommerce to enable e-commerce variable detection (product pricing, cart totals, checkout information, etc.).', 'datalayer-manager' ); ?>
+                            </p>
                         </div>
-                    </li>
-                    <li>
-                        <?php esc_html_e( 'You should see an array containing all the detected variables for the current page.', 'datalayer-manager' ); ?>
-                    </li>
-                </ol>
-                <p>
-                    <strong><?php esc_html_e( 'Tip:', 'datalayer-manager' ); ?></strong>
-                    <?php esc_html_e( 'You can also expand the array in the console to see individual variables and their values.', 'datalayer-manager' ); ?>
-                </p>
+                    <?php endif; ?>
+                </div>
+
+                <!-- How It Works Section -->
+                <div style="background: #fff; border: 1px solid #ccd0d4; box-shadow: 0 1px 1px rgba(0,0,0,.04); padding: 20px; margin: 20px 0;">
+                    <h2 style="margin-top: 0;"><?php esc_html_e( 'How It Works', 'datalayer-manager' ); ?></h2>
+                    <p style="font-size: 14px; line-height: 1.8;">
+                        <?php esc_html_e( 'DataLayer Manager uses WordPress hooks to automatically detect page context (page type, post information, categories, user status, etc.) and WooCommerce data (products, cart, checkout) when available. All detected variables are then injected into', 'datalayer-manager' ); ?>
+                        <code>window.dataLayer</code>
+                        <?php esc_html_e( 'on every frontend page using the', 'datalayer-manager' ); ?>
+                        <code>.push()</code>
+                        <?php esc_html_e( 'method, which is the recommended approach for Google Tag Manager and Google Analytics 4.', 'datalayer-manager' ); ?>
+                    </p>
+                    <p style="font-size: 14px; line-height: 1.8;">
+                        <?php esc_html_e( 'The dataLayer object is created automatically if it doesn\'t exist, so it works seamlessly with existing Google Tag Manager installations. Custom variables added via the editor are merged with auto-detected variables, with custom variables taking precedence if there are any conflicts.', 'datalayer-manager' ); ?>
+                    </p>
+                </div>
+
             </div>
         </div>
         <?php

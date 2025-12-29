@@ -71,8 +71,9 @@ class DataLayer_Manager {
         // Get auto-detected variables.
         $variables = $this->get_automatic_datalayer_variables();
 
-        // Get all possible variables documentation.
-        $all_possible_variables = $this->get_all_possible_variables_doc();
+        // Get WordPress and WooCommerce variables documentation.
+        $wordpress_variables = $this->get_wordpress_variables_doc();
+        $woocommerce_variables = $this->get_woocommerce_variables_doc();
 
         ?>
         <div class="wrap">
@@ -87,9 +88,9 @@ class DataLayer_Manager {
                     <?php esc_html_e( 'DataLayer variables are automatically detected from WordPress context and injected on the frontend.', 'datalayer-manager' ); ?>
                 </p>
 
-                <h3><?php esc_html_e( 'All Default Possible Variables', 'datalayer-manager' ); ?></h3>
+                <h3><?php esc_html_e( 'WordPress Default Variables', 'datalayer-manager' ); ?></h3>
                 <p>
-                    <?php esc_html_e( 'The following variables can be automatically detected by the plugin:', 'datalayer-manager' ); ?>
+                    <?php esc_html_e( 'The following WordPress variables can be automatically detected:', 'datalayer-manager' ); ?>
                 </p>
                 <table class="wp-list-table widefat fixed striped">
                     <thead>
@@ -100,7 +101,7 @@ class DataLayer_Manager {
                         </tr>
                     </thead>
                     <tbody>
-                        <?php foreach ( $all_possible_variables as $var ) : ?>
+                        <?php foreach ( $wordpress_variables as $var ) : ?>
                             <tr>
                                 <td><strong><code><?php echo esc_html( $var['name'] ); ?></code></strong></td>
                                 <td><?php echo esc_html( $var['type'] ); ?></td>
@@ -109,6 +110,38 @@ class DataLayer_Manager {
                         <?php endforeach; ?>
                     </tbody>
                 </table>
+
+                
+                <?php if ( $this->is_woocommerce_active() ) : ?>
+                    <h3><?php esc_html_e( 'WooCommerce Variables', 'datalayer-manager' ); ?></h3>
+                    <p>
+                        <?php esc_html_e( 'The following WooCommerce variables can be automatically detected when WooCommerce is active:', 'datalayer-manager' ); ?>
+                    </p>
+                    <table class="wp-list-table widefat fixed striped">
+                        <thead>
+                            <tr>
+                                <th scope="col" style="width: 25%;"><?php esc_html_e( 'Variable Name', 'datalayer-manager' ); ?></th>
+                                <th scope="col" style="width: 20%;"><?php esc_html_e( 'Type', 'datalayer-manager' ); ?></th>
+                                <th scope="col" style="width: 55%;"><?php esc_html_e( 'Description', 'datalayer-manager' ); ?></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php foreach ( $woocommerce_variables as $var ) : ?>
+                                <tr>
+                                    <td><strong><code><?php echo esc_html( $var['name'] ); ?></code></strong></td>
+                                    <td><?php echo esc_html( $var['type'] ); ?></td>
+                                    <td><?php echo esc_html( $var['description'] ); ?></td>
+                                </tr>
+                            <?php endforeach; ?>
+                        </tbody>
+                    </table>
+                <?php else : ?>
+                    <div class="notice notice-info">
+                        <p>
+                            <?php esc_html_e( 'WooCommerce is not currently active. Install and activate WooCommerce to enable e-commerce variable detection (product pricing, cart totals, checkout information, etc.).', 'datalayer-manager' ); ?>
+                        </p>
+                    </div>
+                <?php endif; ?>
 
                 <h3><?php esc_html_e( 'How It Works', 'datalayer-manager' ); ?></h3>
                 <p>
@@ -151,11 +184,11 @@ class DataLayer_Manager {
     }
 
     /**
-     * Get documentation for all possible variables that can be detected.
+     * Get documentation for WordPress variables that can be detected.
      *
      * @return array Array of variable documentation with name, type, and description.
      */
-    private function get_all_possible_variables_doc() {
+    private function get_wordpress_variables_doc() {
         return array(
             array(
                 'name' => 'pageType',
@@ -251,6 +284,155 @@ class DataLayer_Manager {
                 'name' => 'siteUrl',
                 'type' => 'string',
                 'description' => __( 'The URL of the WordPress site home page. Always present.', 'datalayer-manager' ),
+            ),
+        );
+    }
+
+    /**
+     * Get documentation for WooCommerce variables that can be detected.
+     *
+     * @return array Array of variable documentation with name, type, and description.
+     */
+    private function get_woocommerce_variables_doc() {
+        return array(
+            // WooCommerce Product Variables.
+            array(
+                'name' => 'productId',
+                'type' => 'number',
+                'description' => __( 'WooCommerce product ID. Only on single product pages.', 'datalayer-manager' ),
+            ),
+            array(
+                'name' => 'productName',
+                'type' => 'string',
+                'description' => __( 'WooCommerce product name. Only on single product pages.', 'datalayer-manager' ),
+            ),
+            array(
+                'name' => 'productSku',
+                'type' => 'string',
+                'description' => __( 'WooCommerce product SKU. Only on single product pages.', 'datalayer-manager' ),
+            ),
+            array(
+                'name' => 'productPrice',
+                'type' => 'number',
+                'description' => __( 'WooCommerce product current price. Only on single product pages.', 'datalayer-manager' ),
+            ),
+            array(
+                'name' => 'productRegularPrice',
+                'type' => 'number',
+                'description' => __( 'WooCommerce product regular price. Only on single product pages.', 'datalayer-manager' ),
+            ),
+            array(
+                'name' => 'productSalePrice',
+                'type' => 'number',
+                'description' => __( 'WooCommerce product sale price (null if not on sale). Only on single product pages.', 'datalayer-manager' ),
+            ),
+            array(
+                'name' => 'productStockStatus',
+                'type' => 'string',
+                'description' => __( 'WooCommerce product stock status (instock, outofstock, etc.). Only on single product pages.', 'datalayer-manager' ),
+            ),
+            array(
+                'name' => 'productStockQuantity',
+                'type' => 'number',
+                'description' => __( 'WooCommerce product stock quantity. Only on single product pages.', 'datalayer-manager' ),
+            ),
+            array(
+                'name' => 'productType',
+                'type' => 'string',
+                'description' => __( 'WooCommerce product type (simple, variable, grouped, etc.). Only on single product pages.', 'datalayer-manager' ),
+            ),
+            array(
+                'name' => 'productOnSale',
+                'type' => 'boolean',
+                'description' => __( 'Whether WooCommerce product is on sale. Only on single product pages.', 'datalayer-manager' ),
+            ),
+            array(
+                'name' => 'productCategory',
+                'type' => 'array',
+                'description' => __( 'Array of WooCommerce product category names. Only on single product pages if categories exist.', 'datalayer-manager' ),
+            ),
+            array(
+                'name' => 'productTag',
+                'type' => 'array',
+                'description' => __( 'Array of WooCommerce product tag names. Only on single product pages if tags exist.', 'datalayer-manager' ),
+            ),
+            array(
+                'name' => 'productBrand',
+                'type' => 'array',
+                'description' => __( 'Array of product brand names (if WooCommerce Brands plugin is active). Only on single product pages.', 'datalayer-manager' ),
+            ),
+            // WooCommerce Page Type Variables.
+            array(
+                'name' => 'pageType',
+                'type' => 'string',
+                'description' => __( 'WooCommerce page types: "shop", "product_category", "product_tag", "cart", "checkout", "account". Overrides standard WordPress pageType.', 'datalayer-manager' ),
+            ),
+            array(
+                'name' => 'productCategoryName',
+                'type' => 'string',
+                'description' => __( 'WooCommerce product category name. Only on product category archive pages.', 'datalayer-manager' ),
+            ),
+            array(
+                'name' => 'productCategoryId',
+                'type' => 'number',
+                'description' => __( 'WooCommerce product category ID. Only on product category archive pages.', 'datalayer-manager' ),
+            ),
+            array(
+                'name' => 'productTagName',
+                'type' => 'string',
+                'description' => __( 'WooCommerce product tag name. Only on product tag archive pages.', 'datalayer-manager' ),
+            ),
+            array(
+                'name' => 'productTagId',
+                'type' => 'number',
+                'description' => __( 'WooCommerce product tag ID. Only on product tag archive pages.', 'datalayer-manager' ),
+            ),
+            // WooCommerce Cart Variables.
+            array(
+                'name' => 'cartTotal',
+                'type' => 'number',
+                'description' => __( 'WooCommerce cart total amount. Only on cart page.', 'datalayer-manager' ),
+            ),
+            array(
+                'name' => 'cartSubtotal',
+                'type' => 'number',
+                'description' => __( 'WooCommerce cart subtotal amount. Only on cart page.', 'datalayer-manager' ),
+            ),
+            array(
+                'name' => 'cartItemCount',
+                'type' => 'number',
+                'description' => __( 'WooCommerce cart item count. Only on cart page.', 'datalayer-manager' ),
+            ),
+            array(
+                'name' => 'cartItemQuantity',
+                'type' => 'number',
+                'description' => __( 'WooCommerce cart total quantity. Only on cart page.', 'datalayer-manager' ),
+            ),
+            array(
+                'name' => 'cartItems',
+                'type' => 'array',
+                'description' => __( 'Array of WooCommerce cart items with productId, productName, productSku, productPrice, quantity, lineTotal. Only on cart page.', 'datalayer-manager' ),
+            ),
+            // WooCommerce Checkout Variables.
+            array(
+                'name' => 'checkoutTotal',
+                'type' => 'number',
+                'description' => __( 'WooCommerce checkout total amount. Only on checkout page.', 'datalayer-manager' ),
+            ),
+            array(
+                'name' => 'checkoutSubtotal',
+                'type' => 'number',
+                'description' => __( 'WooCommerce checkout subtotal amount. Only on checkout page.', 'datalayer-manager' ),
+            ),
+            array(
+                'name' => 'checkoutItemCount',
+                'type' => 'number',
+                'description' => __( 'WooCommerce checkout item count. Only on checkout page.', 'datalayer-manager' ),
+            ),
+            array(
+                'name' => 'checkoutItems',
+                'type' => 'array',
+                'description' => __( 'Array of WooCommerce checkout items with productId, productName, productSku, productPrice, quantity, lineTotal. Only on checkout page.', 'datalayer-manager' ),
             ),
         );
     }
@@ -363,6 +545,160 @@ class DataLayer_Manager {
     }
 
     /**
+     * Check if WooCommerce is active.
+     *
+     * @return bool True if WooCommerce is active.
+     */
+    private function is_woocommerce_active() {
+        return class_exists( 'WooCommerce' );
+    }
+
+    /**
+     * Get WooCommerce-specific variables.
+     *
+     * @return array Array of WooCommerce variables.
+     */
+    private function get_woocommerce_variables() {
+        $variables = array();
+
+        if ( ! $this->is_woocommerce_active() ) {
+            return $variables;
+        }
+
+        // Product page detection.
+        if ( function_exists( 'is_product' ) && is_product() ) {
+            $variables['pageType'] = 'product';
+            global $product;
+            
+            if ( $product && is_a( $product, 'WC_Product' ) ) {
+                $variables['productId'] = $product->get_id();
+                $variables['productName'] = $product->get_name();
+                $variables['productSku'] = $product->get_sku();
+                $variables['productPrice'] = (float) $product->get_price();
+                $variables['productRegularPrice'] = (float) $product->get_regular_price();
+                $variables['productSalePrice'] = $product->get_sale_price() ? (float) $product->get_sale_price() : null;
+                $variables['productStockStatus'] = $product->get_stock_status();
+                $variables['productStockQuantity'] = $product->get_stock_quantity();
+                $variables['productType'] = $product->get_type();
+                $variables['productOnSale'] = $product->is_on_sale();
+
+                // Product categories (WooCommerce taxonomy).
+                $product_categories = wp_get_post_terms( $product->get_id(), 'product_cat', array( 'fields' => 'names' ) );
+                if ( ! empty( $product_categories ) && ! is_wp_error( $product_categories ) ) {
+                    $variables['productCategory'] = $product_categories;
+                }
+
+                // Product tags (WooCommerce taxonomy).
+                $product_tags = wp_get_post_terms( $product->get_id(), 'product_tag', array( 'fields' => 'names' ) );
+                if ( ! empty( $product_tags ) && ! is_wp_error( $product_tags ) ) {
+                    $variables['productTag'] = $product_tags;
+                }
+
+                // Product brand (if WooCommerce Brands plugin is active).
+                if ( taxonomy_exists( 'product_brand' ) ) {
+                    $product_brands = wp_get_post_terms( $product->get_id(), 'product_brand', array( 'fields' => 'names' ) );
+                    if ( ! empty( $product_brands ) && ! is_wp_error( $product_brands ) ) {
+                        $variables['productBrand'] = $product_brands;
+                    }
+                }
+            }
+        }
+
+        // Shop page detection.
+        if ( function_exists( 'is_shop' ) && is_shop() ) {
+            $variables['pageType'] = 'shop';
+        }
+        // Product category page.
+        elseif ( function_exists( 'is_product_category' ) && is_product_category() ) {
+            $category = get_queried_object();
+            if ( $category && isset( $category->term_id ) ) {
+                $variables['pageType'] = 'product_category';
+                $variables['productCategoryName'] = $category->name;
+                $variables['productCategoryId'] = $category->term_id;
+            }
+        }
+        // Product tag page.
+        elseif ( function_exists( 'is_product_tag' ) && is_product_tag() ) {
+            $tag = get_queried_object();
+            if ( $tag && isset( $tag->term_id ) ) {
+                $variables['pageType'] = 'product_tag';
+                $variables['productTagName'] = $tag->name;
+                $variables['productTagId'] = $tag->term_id;
+            }
+        }
+
+        // Cart page.
+        if ( function_exists( 'is_cart' ) && is_cart() ) {
+            $variables['pageType'] = 'cart';
+            
+            if ( function_exists( 'WC' ) && WC()->cart ) {
+                $cart = WC()->cart;
+                $variables['cartTotal'] = (float) $cart->get_total( 'edit' );
+                $variables['cartSubtotal'] = (float) $cart->get_subtotal();
+                $variables['cartItemCount'] = $cart->get_cart_contents_count();
+                $variables['cartItemQuantity'] = $cart->get_cart_contents_count();
+
+                // Cart items.
+                $cart_items = array();
+                foreach ( $cart->get_cart() as $cart_item_key => $cart_item ) {
+                    $product = $cart_item['data'];
+                    if ( $product && is_a( $product, 'WC_Product' ) ) {
+                        $cart_items[] = array(
+                            'productId' => $product->get_id(),
+                            'productName' => $product->get_name(),
+                            'productSku' => $product->get_sku(),
+                            'productPrice' => (float) $product->get_price(),
+                            'quantity' => $cart_item['quantity'],
+                            'lineTotal' => (float) $cart_item['line_total'],
+                        );
+                    }
+                }
+                if ( ! empty( $cart_items ) ) {
+                    $variables['cartItems'] = $cart_items;
+                }
+            }
+        }
+
+        // Checkout page.
+        if ( function_exists( 'is_checkout' ) && is_checkout() ) {
+            $variables['pageType'] = 'checkout';
+            
+            if ( function_exists( 'WC' ) && WC()->cart ) {
+                $cart = WC()->cart;
+                $variables['checkoutTotal'] = (float) $cart->get_total( 'edit' );
+                $variables['checkoutSubtotal'] = (float) $cart->get_subtotal();
+                $variables['checkoutItemCount'] = $cart->get_cart_contents_count();
+
+                // Checkout items.
+                $checkout_items = array();
+                foreach ( $cart->get_cart() as $cart_item_key => $cart_item ) {
+                    $product = $cart_item['data'];
+                    if ( $product && is_a( $product, 'WC_Product' ) ) {
+                        $checkout_items[] = array(
+                            'productId' => $product->get_id(),
+                            'productName' => $product->get_name(),
+                            'productSku' => $product->get_sku(),
+                            'productPrice' => (float) $product->get_price(),
+                            'quantity' => $cart_item['quantity'],
+                            'lineTotal' => (float) $cart_item['line_total'],
+                        );
+                    }
+                }
+                if ( ! empty( $checkout_items ) ) {
+                    $variables['checkoutItems'] = $checkout_items;
+                }
+            }
+        }
+
+        // Account page.
+        if ( function_exists( 'is_account_page' ) && is_account_page() ) {
+            $variables['pageType'] = 'account';
+        }
+
+        return $variables;
+    }
+
+    /**
      * Auto-detect WordPress context and build dataLayer variables.
      *
      * @return array Array of dataLayer variables.
@@ -370,34 +706,55 @@ class DataLayer_Manager {
     private function get_automatic_datalayer_variables() {
         $variables = array();
 
-        // Page type detection.
-        if ( is_front_page() ) {
+        // WooCommerce detection (check before general WordPress detection).
+        if ( $this->is_woocommerce_active() ) {
+            $woocommerce_vars = $this->get_woocommerce_variables();
+            if ( ! empty( $woocommerce_vars ) ) {
+                $variables = array_merge( $variables, $woocommerce_vars );
+                
+                // If WooCommerce page type is set, skip general WordPress detection.
+                if ( isset( $variables['pageType'] ) && in_array( $variables['pageType'], array( 'shop', 'product_category', 'product_tag', 'cart', 'checkout', 'account' ), true ) ) {
+                    // Continue to add user and site info below.
+                } elseif ( isset( $variables['pageType'] ) && $variables['pageType'] === 'product' ) {
+                    // Product page - already handled, continue to add user and site info.
+                } else {
+                    // Fall through to general WordPress detection.
+                }
+            }
+        }
+
+        // Page type detection (only if not already set by WooCommerce).
+        if ( ! isset( $variables['pageType'] ) ) {
+            if ( is_front_page() ) {
             $variables['pageType'] = 'home';
         } elseif ( is_home() ) {
             $variables['pageType'] = 'blog';
         } elseif ( is_single() ) {
-            $variables['pageType'] = 'post';
-            $post = get_queried_object();
-            if ( $post ) {
-                $variables['postType'] = get_post_type( $post );
-                $variables['postId'] = $post->ID;
-                $variables['postTitle'] = get_the_title( $post );
-                
-                // Post categories.
-                $categories = get_the_category( $post->ID );
-                if ( ! empty( $categories ) ) {
-                    $variables['postCategory'] = array();
-                    foreach ( $categories as $cat ) {
-                        $variables['postCategory'][] = $cat->name;
+            // Skip if this is a WooCommerce product (already handled).
+            if ( ! ( $this->is_woocommerce_active() && function_exists( 'is_product' ) && is_product() ) ) {
+                $variables['pageType'] = 'post';
+                $post = get_queried_object();
+                if ( $post ) {
+                    $variables['postType'] = get_post_type( $post );
+                    $variables['postId'] = $post->ID;
+                    $variables['postTitle'] = get_the_title( $post );
+                    
+                    // Post categories.
+                    $categories = get_the_category( $post->ID );
+                    if ( ! empty( $categories ) ) {
+                        $variables['postCategory'] = array();
+                        foreach ( $categories as $cat ) {
+                            $variables['postCategory'][] = $cat->name;
+                        }
                     }
-                }
-                
-                // Post tags.
-                $tags = get_the_tags( $post->ID );
-                if ( ! empty( $tags ) ) {
-                    $variables['postTags'] = array();
-                    foreach ( $tags as $tag ) {
-                        $variables['postTags'][] = $tag->name;
+                    
+                    // Post tags.
+                    $tags = get_the_tags( $post->ID );
+                    if ( ! empty( $tags ) ) {
+                        $variables['postTags'] = array();
+                        foreach ( $tags as $tag ) {
+                            $variables['postTags'][] = $tag->name;
+                        }
                     }
                 }
             }
@@ -424,9 +781,12 @@ class DataLayer_Manager {
                 $variables['tagId'] = $tag->term_id;
             }
         } elseif ( is_archive() ) {
-            $variables['pageType'] = 'archive';
-            if ( is_post_type_archive() ) {
-                $variables['archiveType'] = get_post_type();
+            // Skip if this is a WooCommerce archive (already handled).
+            if ( ! ( $this->is_woocommerce_active() && ( ( function_exists( 'is_shop' ) && is_shop() ) || ( function_exists( 'is_product_category' ) && is_product_category() ) || ( function_exists( 'is_product_tag' ) && is_product_tag() ) ) ) ) {
+                $variables['pageType'] = 'archive';
+                if ( is_post_type_archive() ) {
+                    $variables['archiveType'] = get_post_type();
+                }
             }
         } elseif ( is_search() ) {
             $variables['pageType'] = 'search';
@@ -436,6 +796,7 @@ class DataLayer_Manager {
         } else {
             $variables['pageType'] = 'other';
         }
+        } // End if ( ! isset( $variables['pageType'] ) ).
 
         // User information (if logged in).
         if ( is_user_logged_in() ) {

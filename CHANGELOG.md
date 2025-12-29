@@ -9,6 +9,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - Automatic detection of WordPress context (page type, post info, categories, tags, etc.)
+- **WooCommerce integration** with full e-commerce variable detection
+- Product page variables (price, SKU, stock status, categories, tags, brand)
+- Cart page variables (total, subtotal, item count, cart items array)
+- Checkout page variables (total, subtotal, item count, checkout items array)
+- Shop, product category, and product tag archive detection
 - Frontend injection of dataLayer variables using `.push()` method
 - Admin interface to view detected variables
 - Support for all WordPress page types (home, blog, post, page, category, tag, archive, search, 404)

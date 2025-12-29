@@ -5,6 +5,7 @@ A WordPress plugin that automatically detects WordPress context and injects data
 ## Features
 
 - **Automatic Detection**: Automatically detects page type, post information, categories, tags, and more
+- **WooCommerce Support**: Full WooCommerce integration with product, cart, and checkout variables
 - **Zero Configuration**: Works out of the box - no setup required
 - **Frontend Injection**: Automatically injects variables into `window.dataLayer` using the `.push()` method
 - **View-Only Admin**: Simple admin interface to view detected variables
@@ -20,6 +21,7 @@ A WordPress plugin that automatically detects WordPress context and injects data
 
 - WordPress 5.0 or higher
 - PHP 7.4 or higher
+- WooCommerce (optional, for e-commerce variables)
 
 ## Usage
 
@@ -60,6 +62,43 @@ The plugin automatically detects the following variables based on WordPress cont
 - **userId**: User ID (only if user is logged in)
 - **siteName**: WordPress site name (always present)
 - **siteUrl**: WordPress site URL (always present)
+
+### WooCommerce Variables (when WooCommerce is active)
+
+**Product Page Variables:**
+- **productId**: Product ID
+- **productName**: Product name
+- **productSku**: Product SKU
+- **productPrice**: Current product price
+- **productRegularPrice**: Regular product price
+- **productSalePrice**: Sale price (null if not on sale)
+- **productStockStatus**: Stock status (instock, outofstock, etc.)
+- **productStockQuantity**: Stock quantity
+- **productType**: Product type (simple, variable, grouped, etc.)
+- **productOnSale**: Boolean indicating if product is on sale
+- **productCategory**: Array of product category names
+- **productTag**: Array of product tag names
+- **productBrand**: Array of product brand names (if WooCommerce Brands plugin is active)
+
+**Shop & Archive Variables:**
+- **pageType**: "shop", "product_category", or "product_tag"
+- **productCategoryName**: Product category name (on category pages)
+- **productCategoryId**: Product category ID (on category pages)
+- **productTagName**: Product tag name (on tag pages)
+- **productTagId**: Product tag ID (on tag pages)
+
+**Cart Variables (on cart page):**
+- **cartTotal**: Cart total amount
+- **cartSubtotal**: Cart subtotal amount
+- **cartItemCount**: Number of items in cart
+- **cartItemQuantity**: Total quantity of items
+- **cartItems**: Array of cart items with productId, productName, productSku, productPrice, quantity, lineTotal
+
+**Checkout Variables (on checkout page):**
+- **checkoutTotal**: Checkout total amount
+- **checkoutSubtotal**: Checkout subtotal amount
+- **checkoutItemCount**: Number of items in checkout
+- **checkoutItems**: Array of checkout items with productId, productName, productSku, productPrice, quantity, lineTotal
 
 ## Developer Hooks
 

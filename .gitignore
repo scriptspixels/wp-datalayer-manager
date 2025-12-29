@@ -1,0 +1,71 @@
+# WordPress Plugin .gitignore
+
+# OS Files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+desktop.ini
+
+# IDE / Editor Files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.project
+.classpath
+.settings/
+*.sublime-project
+*.sublime-workspace
+*.code-workspace
+
+# PHP
+*.log
+*.cache
+composer.phar
+vendor/
+node_modules/
+
+# Build / Distribution
+*.zip
+*.tar.gz
+build/
+dist/
+release/
+
+# Testing
+.phpunit.result.cache
+coverage/
+.nyc_output/
+
+# Environment / Config
+.env
+.env.local
+.env.*.local
+wp-config.php
+wp-config-local.php
+
+# Temporary Files
+*.tmp
+*.temp
+*.bak
+*.backup
+*.old
+
+# WordPress Specific
+wp-content/uploads/
+wp-content/upgrade/
+wp-content/backup-db/
+wp-content/advanced-cache.php
+wp-content/wp-cache-config.php
+wp-content/cache/
+wp-content/debug.log
+
+# Local Development
+local-config.php
+local-config-sample.php
+

@@ -835,7 +835,15 @@ class DataLayer_Manager {
 
         // Get current post type.
         global $post_type;
-        $allowed_types = apply_filters( 'datalayer_manager_meta_box_post_types', array( 'post', 'page' ) );
+        $allowed_types = array( 'post', 'page' );
+        
+        // Add WooCommerce product if WooCommerce is active.
+        if ( $this->is_woocommerce_active() ) {
+            $allowed_types[] = 'product';
+        }
+        
+        // Allow filtering to add custom post types.
+        $allowed_types = apply_filters( 'datalayer_manager_meta_box_post_types', $allowed_types );
         
         if ( ! in_array( $post_type, $allowed_types, true ) ) {
             return;
@@ -898,6 +906,11 @@ class DataLayer_Manager {
     public function register_meta_boxes() {
         // Add meta box to posts and pages.
         $post_types = array( 'post', 'page' );
+        
+        // Add WooCommerce product if WooCommerce is active.
+        if ( $this->is_woocommerce_active() ) {
+            $post_types[] = 'product';
+        }
         
         // Allow filtering to add custom post types.
         $post_types = apply_filters( 'datalayer_manager_meta_box_post_types', $post_types );
@@ -1143,7 +1156,16 @@ class DataLayer_Manager {
         }
 
         // Check post type.
-        $allowed_types = apply_filters( 'datalayer_manager_meta_box_post_types', array( 'post', 'page' ) );
+        $allowed_types = array( 'post', 'page' );
+        
+        // Add WooCommerce product if WooCommerce is active.
+        if ( $this->is_woocommerce_active() ) {
+            $allowed_types[] = 'product';
+        }
+        
+        // Allow filtering to add custom post types.
+        $allowed_types = apply_filters( 'datalayer_manager_meta_box_post_types', $allowed_types );
+        
         if ( ! in_array( $post->post_type, $allowed_types, true ) ) {
             return;
         }

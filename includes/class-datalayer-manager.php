@@ -26,6 +26,9 @@ class DataLayer_Manager {
         add_action( 'add_meta_boxes', array( $this, 'register_meta_boxes' ) );
         add_action( 'save_post', array( $this, 'save_meta_box' ), 10, 2 );
         
+        // Customize meta boxes panel label in block editor.
+        add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_admin_scripts' ) );
+        
         // Frontend injection.
         add_action( 'wp_head', array( $this, 'inject_datalayer' ), 1 );
     }
@@ -820,6 +823,76 @@ class DataLayer_Manager {
     }
 
     /**
+     * Enqueue admin scripts for block editor customization.
+     *
+     * @param string $hook Current admin page hook.
+     */
+    public function enqueue_admin_scripts( $hook ) {
+        // Only load on post/page edit screens.
+        if ( ! in_array( $hook, array( 'post.php', 'post-new.php' ), true ) ) {
+            return;
+        }
+
+        // Get current post type.
+        global $post_type;
+        $allowed_types = apply_filters( 'datalayer_manager_meta_box_post_types', array( 'post', 'page' ) );
+        
+        if ( ! in_array( $post_type, $allowed_types, true ) ) {
+            return;
+        }
+
+        // Add script to change meta boxes panel label in block editor.
+        add_action( 'admin_footer', array( $this, 'change_meta_boxes_label_script' ) );
+    }
+
+    /**
+     * Output script to change meta boxes panel label.
+     */
+    public function change_meta_boxes_label_script() {
+        ?>
+        <script type="text/javascript">
+        (function() {
+            function changeMetaBoxesLabel() {
+                var button = document.querySelector('.edit-post-meta-boxes-main__presenter button[aria-expanded]');
+                if (button && button.textContent.trim().includes('Meta Boxes')) {
+                    button.innerHTML = button.innerHTML.replace(/Meta Boxes/g, '<?php echo esc_js( __( 'DataLayer Manager', 'datalayer-manager' ) ); ?>');
+                }
+            }
+            
+            // Try immediately.
+            changeMetaBoxesLabel();
+            
+            // Try after DOM is ready.
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', changeMetaBoxesLabel);
+            }
+            
+            // Try after delays (block editor loads async).
+            setTimeout(changeMetaBoxesLabel, 500);
+            setTimeout(changeMetaBoxesLabel, 1000);
+            setTimeout(changeMetaBoxesLabel, 2000);
+            
+            // Also watch for dynamic changes (block editor may update the DOM).
+            if (typeof MutationObserver !== 'undefined') {
+                var observer = new MutationObserver(function(mutations) {
+                    changeMetaBoxesLabel();
+                });
+                
+                var target = document.querySelector('.edit-post-meta-boxes-main__presenter');
+                if (target) {
+                    observer.observe(target, {
+                        childList: true,
+                        subtree: true,
+                        characterData: true
+                    });
+                }
+            }
+        })();
+        </script>
+        <?php
+    }
+
+    /**
      * Register meta boxes for posts and pages.
      */
     public function register_meta_boxes() {
@@ -835,8 +908,8 @@ class DataLayer_Manager {
                 __( 'DataLayer Variables', 'datalayer-manager' ),
                 array( $this, 'render_meta_box' ),
                 $post_type,
-                'side',
-                'default'
+                'normal', // Use 'normal' context (bottom area) for better space
+                'high'    // High priority to appear near the top
             );
         }
     }
@@ -909,39 +982,56 @@ class DataLayer_Manager {
             
             <div id="datalayer-custom-variables">
                 <?php if ( ! empty( $filtered_custom_variables ) ) : ?>
-                    <?php $index = 0; ?>
-                    <?php foreach ( $filtered_custom_variables as $key => $value ) : ?>
-                        <?php
-                        $type = $this->get_value_type( $value );
-                        $display_value = $this->format_value_for_edit( $value, $type );
-                        ?>
-                        <div class="datalayer-variable-row" style="margin-bottom: 10px;">
-                            <label style="display: block; margin-bottom: 3px;">
-                                <strong><?php esc_html_e( 'Name:', 'datalayer-manager' ); ?></strong>
-                                <input type="text" name="datalayer_variables[<?php echo esc_attr( $index ); ?>][key]" value="<?php echo esc_attr( $key ); ?>" class="widefat datalayer-variable-key" pattern="[A-Za-z0-9_]+" required />
-                            </label>
-                            <label style="display: block; margin-bottom: 3px;">
-                                <strong><?php esc_html_e( 'Value:', 'datalayer-manager' ); ?></strong>
-                                <input type="text" name="datalayer_variables[<?php echo esc_attr( $index ); ?>][value]" value="<?php echo esc_attr( $display_value ); ?>" class="widefat" required />
-                            </label>
-                            <label style="display: block; margin-bottom: 3px;">
-                                <strong><?php esc_html_e( 'Type:', 'datalayer-manager' ); ?></strong>
-                                <select style="padding-right: initial;" name="datalayer_variables[<?php echo esc_attr( $index ); ?>][type]" class="widefat">
-                                    <option value="string" <?php selected( $type, 'string' ); ?>><?php esc_html_e( 'String', 'datalayer-manager' ); ?></option>
-                                    <option value="number" <?php selected( $type, 'number' ); ?>><?php esc_html_e( 'Number', 'datalayer-manager' ); ?></option>
-                                    <option value="boolean" <?php selected( $type, 'boolean' ); ?>><?php esc_html_e( 'Boolean', 'datalayer-manager' ); ?></option>
-                                </select>
-                            </label>
-                            <button type="button" class="button button-small remove-variable-row" style="margin-top: 5px;"><?php esc_html_e( 'Remove', 'datalayer-manager' ); ?></button>
-                        </div>
-                        <?php $index++; ?>
-                    <?php endforeach; ?>
+                    <table class="wp-list-table widefat fixed striped" style="margin-top: 10px;">
+                        <thead>
+                            <tr>
+                                <th style="width: 30%;"><?php esc_html_e( 'Name', 'datalayer-manager' ); ?></th>
+                                <th style="width: 40%;"><?php esc_html_e( 'Value', 'datalayer-manager' ); ?></th>
+                                <th style="width: 20%;"><?php esc_html_e( 'Type', 'datalayer-manager' ); ?></th>
+                                <th style="width: 10%;"><?php esc_html_e( 'Actions', 'datalayer-manager' ); ?></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php $index = 0; ?>
+                            <?php foreach ( $filtered_custom_variables as $key => $value ) : ?>
+                                <?php
+                                $type = $this->get_value_type( $value );
+                                $display_value = $this->format_value_for_edit( $value, $type );
+                                ?>
+                                <tr class="datalayer-variable-row">
+                                    <td>
+                                        <input type="text" name="datalayer_variables[<?php echo esc_attr( $index ); ?>][key]" value="<?php echo esc_attr( $key ); ?>" class="regular-text datalayer-variable-key" pattern="[A-Za-z0-9_]+" required />
+                                    </td>
+                                    <td>
+                                        <input type="text" name="datalayer_variables[<?php echo esc_attr( $index ); ?>][value]" value="<?php echo esc_attr( $display_value ); ?>" class="regular-text" required />
+                                    </td>
+                                    <td>
+                                        <select name="datalayer_variables[<?php echo esc_attr( $index ); ?>][type]" class="regular-text">
+                                            <option value="string" <?php selected( $type, 'string' ); ?>><?php esc_html_e( 'String', 'datalayer-manager' ); ?></option>
+                                            <option value="number" <?php selected( $type, 'number' ); ?>><?php esc_html_e( 'Number', 'datalayer-manager' ); ?></option>
+                                            <option value="boolean" <?php selected( $type, 'boolean' ); ?>><?php esc_html_e( 'Boolean', 'datalayer-manager' ); ?></option>
+                                        </select>
+                                    </td>
+                                    <td>
+                                        <button type="button" class="button button-small remove-variable-row"><?php esc_html_e( 'Remove', 'datalayer-manager' ); ?></button>
+                                    </td>
+                                </tr>
+                                <?php $index++; ?>
+                            <?php endforeach; ?>
+                        </tbody>
+                    </table>
+                <?php else : ?>
+                    <p class="description" style="margin-top: 10px;">
+                        <?php esc_html_e( 'No custom variables added yet. Click "Add Variable" to create one.', 'datalayer-manager' ); ?>
+                    </p>
                 <?php endif; ?>
             </div>
             
-            <button type="button" class="button button-secondary" id="add-datalayer-variable" style="margin-top: 10px;">
-                <?php esc_html_e( '+ Add Variable', 'datalayer-manager' ); ?>
-            </button>
+            <p style="margin-top: 15px;">
+                <button type="button" class="button button-secondary" id="add-datalayer-variable">
+                    <?php esc_html_e( '+ Add Variable', 'datalayer-manager' ); ?>
+                </button>
+            </p>
             
             <input type="hidden" id="datalayer-auto-detected-keys" value="<?php echo esc_attr( wp_json_encode( $auto_detected_keys ) ); ?>" />
         </div>
@@ -975,26 +1065,36 @@ class DataLayer_Manager {
                 // Add variable row.
                 $('#add-datalayer-variable').on('click', function() {
                     var index = Date.now();
-                    var row = '<div class="datalayer-variable-row" style="margin-bottom: 10px;">' +
-                        '<label style="display: block; margin-bottom: 3px;">' +
-                        '<strong><?php echo esc_js( __( 'Name:', 'datalayer-manager' ) ); ?></strong>' +
-                        '<input type="text" name="datalayer_variables[' + index + '][key]" value="" class="widefat datalayer-variable-key" pattern="[A-Za-z0-9_]+" required />' +
-                        '</label>' +
-                        '<label style="display: block; margin-bottom: 3px;">' +
-                        '<strong><?php echo esc_js( __( 'Value:', 'datalayer-manager' ) ); ?></strong>' +
-                        '<input type="text" name="datalayer_variables[' + index + '][value]" value="" class="widefat" required />' +
-                        '</label>' +
-                        '<label style="display: block; margin-bottom: 3px;">' +
-                        '<strong><?php echo esc_js( __( 'Type:', 'datalayer-manager' ) ); ?></strong>' +
-                        '<select name="datalayer_variables[' + index + '][type]" class="widefat">' +
+                    var tbody = $('#datalayer-custom-variables tbody');
+                    
+                    // Create table structure if it doesn't exist.
+                    if (tbody.length === 0) {
+                        var table = '<table class="wp-list-table widefat fixed striped" style="margin-top: 10px;">' +
+                            '<thead>' +
+                            '<tr>' +
+                            '<th style="width: 30%;"><?php echo esc_js( __( 'Name', 'datalayer-manager' ) ); ?></th>' +
+                            '<th style="width: 40%;"><?php echo esc_js( __( 'Value', 'datalayer-manager' ) ); ?></th>' +
+                            '<th style="width: 20%;"><?php echo esc_js( __( 'Type', 'datalayer-manager' ) ); ?></th>' +
+                            '<th style="width: 10%;"><?php echo esc_js( __( 'Actions', 'datalayer-manager' ) ); ?></th>' +
+                            '</tr>' +
+                            '</thead>' +
+                            '<tbody></tbody>' +
+                            '</table>';
+                        $('#datalayer-custom-variables').html(table);
+                        tbody = $('#datalayer-custom-variables tbody');
+                    }
+                    
+                    var row = '<tr class="datalayer-variable-row">' +
+                        '<td><input type="text" name="datalayer_variables[' + index + '][key]" value="" class="regular-text datalayer-variable-key" pattern="[A-Za-z0-9_]+" required /></td>' +
+                        '<td><input type="text" name="datalayer_variables[' + index + '][value]" value="" class="regular-text" required /></td>' +
+                        '<td><select name="datalayer_variables[' + index + '][type]" class="regular-text">' +
                         '<option value="string"><?php echo esc_js( __( 'String', 'datalayer-manager' ) ); ?></option>' +
                         '<option value="number"><?php echo esc_js( __( 'Number', 'datalayer-manager' ) ); ?></option>' +
                         '<option value="boolean"><?php echo esc_js( __( 'Boolean', 'datalayer-manager' ) ); ?></option>' +
-                        '</select>' +
-                        '</label>' +
-                        '<button type="button" class="button button-small remove-variable-row" style="margin-top: 5px;"><?php echo esc_js( __( 'Remove', 'datalayer-manager' ) ); ?></button>' +
-                        '</div>';
-                    $('#datalayer-custom-variables').append(row);
+                        '</select></td>' +
+                        '<td><button type="button" class="button button-small remove-variable-row"><?php echo esc_js( __( 'Remove', 'datalayer-manager' ) ); ?></button></td>' +
+                        '</tr>';
+                    tbody.append(row);
                 });
                 
                 // Validate on key input.

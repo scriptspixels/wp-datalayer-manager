@@ -842,7 +842,20 @@ class DataLayer_Manager {
             $allowed_types[] = 'product';
         }
         
-        // Allow filtering to add custom post types.
+        // Get all public custom post types.
+        $custom_post_types = get_post_types(
+            array(
+                'public'   => true,
+                '_builtin' => false,
+            ),
+            'names'
+        );
+        
+        if ( ! empty( $custom_post_types ) ) {
+            $allowed_types = array_merge( $allowed_types, $custom_post_types );
+        }
+        
+        // Allow filtering to add/remove post types.
         $allowed_types = apply_filters( 'datalayer_manager_meta_box_post_types', $allowed_types );
         
         if ( ! in_array( $post_type, $allowed_types, true ) ) {
@@ -912,8 +925,25 @@ class DataLayer_Manager {
             $post_types[] = 'product';
         }
         
-        // Allow filtering to add custom post types.
+        // Get all public custom post types (excluding built-in ones we already have).
+        $custom_post_types = get_post_types(
+            array(
+                'public'   => true,
+                '_builtin' => false,
+            ),
+            'names'
+        );
+        
+        // Add custom post types to the list.
+        if ( ! empty( $custom_post_types ) ) {
+            $post_types = array_merge( $post_types, $custom_post_types );
+        }
+        
+        // Allow filtering to add/remove post types.
         $post_types = apply_filters( 'datalayer_manager_meta_box_post_types', $post_types );
+        
+        // Remove duplicates.
+        $post_types = array_unique( $post_types );
         
         foreach ( $post_types as $post_type ) {
             add_meta_box(
@@ -1163,7 +1193,20 @@ class DataLayer_Manager {
             $allowed_types[] = 'product';
         }
         
-        // Allow filtering to add custom post types.
+        // Get all public custom post types.
+        $custom_post_types = get_post_types(
+            array(
+                'public'   => true,
+                '_builtin' => false,
+            ),
+            'names'
+        );
+        
+        if ( ! empty( $custom_post_types ) ) {
+            $allowed_types = array_merge( $allowed_types, $custom_post_types );
+        }
+        
+        // Allow filtering to add/remove post types.
         $allowed_types = apply_filters( 'datalayer_manager_meta_box_post_types', $allowed_types );
         
         if ( ! in_array( $post->post_type, $allowed_types, true ) ) {
@@ -1307,6 +1350,32 @@ class DataLayer_Manager {
             $variables['pageId'] = $post->ID;
             $variables['pageTitle'] = get_the_title( $post );
             $variables['pageSlug'] = $post->post_name;
+        } else {
+            // Custom post types - use generic post variables.
+            $variables['pageType'] = 'post';
+            $variables['postType'] = $post->post_type;
+            $variables['postId'] = $post->ID;
+            $variables['postTitle'] = get_the_title( $post );
+            
+            // Try to get categories if the post type supports them.
+            $taxonomies = get_object_taxonomies( $post->post_type, 'objects' );
+            foreach ( $taxonomies as $taxonomy ) {
+                if ( $taxonomy->hierarchical ) {
+                    // Hierarchical taxonomy (like categories).
+                    $terms = wp_get_post_terms( $post->ID, $taxonomy->name, array( 'fields' => 'names' ) );
+                    if ( ! empty( $terms ) && ! is_wp_error( $terms ) ) {
+                        $key = $taxonomy->name . 'Category';
+                        $variables[ $key ] = $terms;
+                    }
+                } else {
+                    // Non-hierarchical taxonomy (like tags).
+                    $terms = wp_get_post_terms( $post->ID, $taxonomy->name, array( 'fields' => 'names' ) );
+                    if ( ! empty( $terms ) && ! is_wp_error( $terms ) ) {
+                        $key = $taxonomy->name . 'Tags';
+                        $variables[ $key ] = $terms;
+                    }
+                }
+            }
         }
         
         // WooCommerce variables (if WooCommerce is active and this is a product).

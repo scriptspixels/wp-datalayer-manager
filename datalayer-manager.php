@@ -2,7 +2,7 @@
 /**
  * Plugin Name: DataLayer Manager
  * Plugin URI: https://scriptsandpixels.studio
- * Description: Automatically detects WordPress context and injects dataLayer variables for analytics tools (e.g., GA4/GTM). No configuration needed - works automatically.
+ * Description: Automatically detects WordPress context and injects dataLayer variables for analytics tools (GA4/GTM). Premium: Custom variables per page/post. No coding required.
  * Version: 1.0.0
  * Author: Scripts + Pixels
  * Author URI: https://scriptsandpixels.studio
@@ -95,6 +95,7 @@ if ( ! datalayer_manager_check_requirements() ) {
 
 // Load plugin classes.
 require_once DATALAYER_MANAGER_PLUGIN_DIR . 'includes/class-capabilities.php';
+require_once DATALAYER_MANAGER_PLUGIN_DIR . 'includes/class-license-manager.php';
 require_once DATALAYER_MANAGER_PLUGIN_DIR . 'includes/class-datalayer-manager.php';
 
 /**
@@ -159,4 +160,63 @@ function datalayer_manager_init() {
     do_action( 'datalayer_manager_init', $plugin );
 }
 add_action( 'plugins_loaded', 'datalayer_manager_init', 10 );
+
+/**
+ * Add plugin action links.
+ *
+ * @param array $links Existing action links.
+ * @return array Modified action links.
+ */
+function datalayer_manager_plugin_action_links( $links ) {
+    // Add settings link.
+    $settings_link = sprintf(
+        '<a href="%s">%s</a>',
+        esc_url( admin_url( 'options-general.php?page=datalayer-manager' ) ),
+        esc_html__( 'Settings', 'datalayer-manager' )
+    );
+    array_unshift( $links, $settings_link );
+
+    return $links;
+}
+add_filter( 'plugin_action_links_' . plugin_basename( DATALAYER_MANAGER_PLUGIN_FILE ), 'datalayer_manager_plugin_action_links' );
+
+/**
+ * Add plugin row meta links.
+ *
+ * @param array  $links Existing row meta links.
+ * @param string $file  Plugin file.
+ * @return array Modified row meta links.
+ */
+function datalayer_manager_plugin_row_meta( $links, $file ) {
+    // Only add links for this plugin.
+    if ( plugin_basename( DATALAYER_MANAGER_PLUGIN_FILE ) !== $file ) {
+        return $links;
+    }
+
+    // Add "License" link.
+    $license_link = sprintf(
+        '<a href="%s">%s</a>',
+        esc_url( admin_url( 'options-general.php?page=datalayer-manager&screen=license' ) ),
+        esc_html__( 'Activate License', 'datalayer-manager' )
+    );
+    $links[] = $license_link;
+
+    return $links;
+}
+add_filter( 'plugin_row_meta', 'datalayer_manager_plugin_row_meta', 10, 2 );
+
+/**
+ * Check if premium features are active.
+ *
+ * @return bool True if premium license is valid, false otherwise.
+ */
+function datalayer_manager_is_premium() {
+    static $license_manager = null;
+    
+    if ( null === $license_manager ) {
+        $license_manager = new DataLayer_Manager_License();
+    }
+    
+    return $license_manager->is_license_valid();
+}
 

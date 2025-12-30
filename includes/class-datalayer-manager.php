@@ -16,21 +16,62 @@ if ( ! defined( 'ABSPATH' ) ) {
 class DataLayer_Manager {
 
     /**
+     * License manager instance.
+     *
+     * @var DataLayer_Manager_License
+     */
+    private $license_manager;
+
+    /**
      * Initialize the plugin.
      */
     public function init() {
+        // Initialize license manager.
+        $this->license_manager = new DataLayer_Manager_License();
+        
+        // Enable test mode if constant is set (for development/testing).
+        if ( defined( 'DATALAYER_MANAGER_TEST_MODE' ) && DATALAYER_MANAGER_TEST_MODE ) {
+            $this->license_manager->enable_test_mode();
+        }
+
         // Register admin menu.
         add_action( 'admin_menu', array( $this, 'register_admin_menu' ) );
         
-        // Register meta boxes for premium features.
-        add_action( 'add_meta_boxes', array( $this, 'register_meta_boxes' ) );
-        add_action( 'save_post', array( $this, 'save_meta_box' ), 10, 2 );
-        
-        // Customize meta boxes panel label in block editor.
-        add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_admin_scripts' ) );
+        // Register meta boxes for premium features (only if license is valid).
+        if ( $this->is_premium_active() ) {
+            add_action( 'add_meta_boxes', array( $this, 'register_meta_boxes' ) );
+            add_action( 'save_post', array( $this, 'save_meta_box' ), 10, 2 );
+            
+            // Customize meta boxes panel label in block editor.
+            add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_admin_scripts' ) );
+        }
         
         // Frontend injection.
         add_action( 'wp_head', array( $this, 'inject_datalayer' ), 1 );
+    }
+
+    /**
+     * Check if premium features are active (license is valid).
+     *
+     * @return bool True if premium is active, false otherwise.
+     */
+    public function is_premium_active() {
+        if ( ! isset( $this->license_manager ) ) {
+            $this->license_manager = new DataLayer_Manager_License();
+        }
+        return $this->license_manager->is_license_valid();
+    }
+
+    /**
+     * Get license manager instance.
+     *
+     * @return DataLayer_Manager_License License manager instance.
+     */
+    public function get_license_manager() {
+        if ( ! isset( $this->license_manager ) ) {
+            $this->license_manager = new DataLayer_Manager_License();
+        }
+        return $this->license_manager;
     }
 
     /**
@@ -44,6 +85,149 @@ class DataLayer_Manager {
             'datalayer-manager',
             array( $this, 'render_admin_page' )
         );
+    }
+
+    /**
+     * Render Screen: License Settings.
+     */
+    private function render_screen_license() {
+        // Check capabilities.
+        if ( ! current_user_can( 'manage_options' ) ) {
+            wp_die( esc_html__( 'You do not have permission to view this page.', 'datalayer-manager' ) );
+        }
+
+        $license_manager = $this->get_license_manager();
+        $license_key = $license_manager->get_license_key();
+        $license_status = $license_manager->get_license_status();
+
+        ?>
+        <div class="wrap">
+            <h1><?php echo esc_html( get_admin_page_title() ); ?></h1>
+            
+            <!-- Navigation Tabs -->
+            <nav class="nav-tab-wrapper" style="margin-bottom: 20px;">
+                <a href="<?php echo esc_url( admin_url( 'options-general.php?page=datalayer-manager' ) ); ?>" class="nav-tab">
+                    <?php esc_html_e( 'Overview', 'datalayer-manager' ); ?>
+                </a>
+                <a href="<?php echo esc_url( admin_url( 'options-general.php?page=datalayer-manager&screen=license' ) ); ?>" class="nav-tab nav-tab-active">
+                    <?php esc_html_e( 'License', 'datalayer-manager' ); ?>
+                </a>
+            </nav>
+
+            <div style="max-width: 800px;">
+                <?php if ( defined( 'DATALAYER_MANAGER_TEST_MODE' ) && DATALAYER_MANAGER_TEST_MODE ) : ?>
+                    <div class="notice notice-info" style="margin: 20px 0;">
+                        <p>
+                            <strong><?php esc_html_e( 'Test Mode Active', 'datalayer-manager' ); ?></strong><br>
+                            <?php esc_html_e( 'Test mode is enabled. Use the test license key:', 'datalayer-manager' ); ?>
+                            <code style="background: #f0f0f0; padding: 2px 6px; border-radius: 3px;">TEST-LICENSE-KEY-12345</code>
+                        </p>
+                    </div>
+                <?php endif; ?>
+                
+                <div style="background: #fff; border: 1px solid #ccd0d4; box-shadow: 0 1px 1px rgba(0,0,0,.04); padding: 20px; margin: 20px 0;">
+                    <h2 style="margin-top: 0;"><?php esc_html_e( 'License Activation', 'datalayer-manager' ); ?></h2>
+                    <p>
+                        <?php esc_html_e( 'Activate your premium license to unlock custom variables and advanced features.', 'datalayer-manager' ); ?>
+                    </p>
+
+                    <form method="post" action="<?php echo esc_url( admin_url( 'options-general.php?page=datalayer-manager&screen=license' ) ); ?>">
+                        <?php wp_nonce_field( 'datalayer_manager_license_action', 'datalayer_manager_license_nonce' ); ?>
+
+                        <table class="form-table">
+                            <tr>
+                                <th scope="row">
+                                    <label for="datalayer_manager_license_key"><?php esc_html_e( 'License Key', 'datalayer-manager' ); ?></label>
+                                </th>
+                                <td>
+                                    <input 
+                                        type="text" 
+                                        id="datalayer_manager_license_key" 
+                                        name="datalayer_manager_license_key" 
+                                        value="<?php echo esc_attr( $license_key ); ?>" 
+                                        class="regular-text" 
+                                        placeholder="<?php esc_attr_e( 'Enter your license key', 'datalayer-manager' ); ?>"
+                                    />
+                                    <p class="description">
+                                        <?php esc_html_e( 'Enter your premium license key. You can find this in your account dashboard after purchase.', 'datalayer-manager' ); ?>
+                                    </p>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th scope="row"><?php esc_html_e( 'License Status', 'datalayer-manager' ); ?></th>
+                                <td>
+                                    <?php
+                                    $status_labels = array(
+                                        'valid'    => __( 'Active', 'datalayer-manager' ),
+                                        'invalid'  => __( 'Invalid', 'datalayer-manager' ),
+                                        'expired'  => __( 'Expired', 'datalayer-manager' ),
+                                        'inactive' => __( 'Inactive', 'datalayer-manager' ),
+                                        'none'     => __( 'Not Activated', 'datalayer-manager' ),
+                                    );
+
+                                    $status_label = isset( $status_labels[ $license_status ] ) ? $status_labels[ $license_status ] : ucfirst( $license_status );
+                                    $status_class = 'valid' === $license_status ? 'datalayer-status-active' : 'datalayer-status-inactive';
+
+                                    if ( 'valid' === $license_status ) {
+                                        $status_color = '#46b450';
+                                    } elseif ( 'expired' === $license_status ) {
+                                        $status_color = '#dc3232';
+                                    } else {
+                                        $status_color = '#999';
+                                    }
+                                    ?>
+                                    <span style="color: <?php echo esc_attr( $status_color ); ?>; font-weight: bold;">
+                                        <?php echo esc_html( $status_label ); ?>
+                                    </span>
+                                    <?php if ( 'valid' !== $license_status && ! empty( $license_key ) ) : ?>
+                                        <p class="description">
+                                            <?php esc_html_e( 'Your license key is not active. Please check your key or contact support.', 'datalayer-manager' ); ?>
+                                        </p>
+                                    <?php endif; ?>
+                                </td>
+                            </tr>
+                        </table>
+
+                        <p class="submit">
+                            <?php if ( 'valid' === $license_status ) : ?>
+                                <input 
+                                    type="submit" 
+                                    name="datalayer_manager_deactivate_license" 
+                                    class="button button-secondary" 
+                                    value="<?php esc_attr_e( 'Deactivate License', 'datalayer-manager' ); ?>"
+                                />
+                            <?php else : ?>
+                                <input 
+                                    type="submit" 
+                                    name="datalayer_manager_activate_license" 
+                                    class="button button-primary" 
+                                    value="<?php esc_attr_e( 'Activate License', 'datalayer-manager' ); ?>"
+                                />
+                            <?php endif; ?>
+                        </p>
+                    </form>
+                </div>
+
+                <div style="background: #fff; border: 1px solid #ccd0d4; box-shadow: 0 1px 1px rgba(0,0,0,.04); padding: 20px; margin: 20px 0;">
+                    <h2 style="margin-top: 0;"><?php esc_html_e( 'Premium Features', 'datalayer-manager' ); ?></h2>
+                    <p><?php esc_html_e( 'With a premium license, you get access to:', 'datalayer-manager' ); ?></p>
+                    <ul style="list-style-type: disc; margin-left: 30px;">
+                        <li><?php esc_html_e( 'Add custom variables on any page, post, or product', 'datalayer-manager' ); ?></li>
+                        <li><?php esc_html_e( 'Visual editor in WordPress admin', 'datalayer-manager' ); ?></li>
+                        <li><?php esc_html_e( 'Preview auto-detected variables before publishing', 'datalayer-manager' ); ?></li>
+                        <li><?php esc_html_e( 'Priority support and updates', 'datalayer-manager' ); ?></li>
+                    </ul>
+                    <?php if ( 'valid' !== $license_status ) : ?>
+                        <p>
+                            <a href="#" class="button button-primary" target="_blank">
+                                <?php esc_html_e( 'Get Premium License', 'datalayer-manager' ); ?>
+                            </a>
+                        </p>
+                    <?php endif; ?>
+                </div>
+            </div>
+        </div>
+        <?php
     }
 
     /**
@@ -63,6 +247,9 @@ class DataLayer_Manager {
         switch ( $screen ) {
             case 'view':
                 $this->render_screen_view();
+                break;
+            case 'license':
+                $this->render_screen_license();
                 break;
             case 'overview':
             default:
@@ -85,8 +272,27 @@ class DataLayer_Manager {
         ?>
         <div class="wrap">
             <h1><?php echo esc_html( get_admin_page_title() ); ?></h1>
+            
+            <!-- Navigation Tabs -->
+            <nav class="nav-tab-wrapper" style="margin-bottom: 20px;">
+                <a href="<?php echo esc_url( admin_url( 'options-general.php?page=datalayer-manager' ) ); ?>" class="nav-tab nav-tab-active">
+                    <?php esc_html_e( 'Overview', 'datalayer-manager' ); ?>
+                </a>
+                <a href="<?php echo esc_url( admin_url( 'options-general.php?page=datalayer-manager&screen=license' ) ); ?>" class="nav-tab">
+                    <?php esc_html_e( 'License', 'datalayer-manager' ); ?>
+                </a>
+            </nav>
 
             <div class="datalayer-manager-status" style="max-width: 1200px;">
+                
+                <!-- Current Status Section -->
+                <div style="background: #fff; border: 1px solid #ccd0d4; box-shadow: 0 1px 1px rgba(0,0,0,.04); padding: 20px; margin: 20px 0;">
+                    <h2 style="margin-top: 0;"><?php esc_html_e( 'Current Status', 'datalayer-manager' ); ?></h2>
+                    <p style="font-size: 14px; padding: 10px; background: #d4edda; border-left: 4px solid #28a745; margin: 10px 0;">
+                        <strong style="color: #155724;">✓ <?php esc_html_e( 'Auto-Detection Active', 'datalayer-manager' ); ?></strong><br>
+                        <?php esc_html_e( 'DataLayer variables are being automatically detected and injected on all frontend pages.', 'datalayer-manager' ); ?>
+                    </p>
+                </div>
                 
                 <!-- Introduction Section -->
                 <div style="background: #fff; border: 1px solid #ccd0d4; box-shadow: 0 1px 1px rgba(0,0,0,.04); padding: 20px; margin: 20px 0;">
@@ -96,16 +302,15 @@ class DataLayer_Manager {
                     </p>
                     <p style="font-size: 15px; line-height: 1.6;">
                         <strong><?php esc_html_e( 'No coding required!', 'datalayer-manager' ); ?></strong>
-                        <?php esc_html_e( 'The plugin automatically detects WordPress and WooCommerce data and injects it into the dataLayer on every page. You can also add custom variables on a per-page basis using the editor.', 'datalayer-manager' ); ?>
-                    </p>
-                </div>
-
-                <!-- Current Status Section -->
-                <div style="background: #fff; border: 1px solid #ccd0d4; box-shadow: 0 1px 1px rgba(0,0,0,.04); padding: 20px; margin: 20px 0;">
-                    <h2 style="margin-top: 0;"><?php esc_html_e( 'Current Status', 'datalayer-manager' ); ?></h2>
-                    <p style="font-size: 14px; padding: 10px; background: #d4edda; border-left: 4px solid #28a745; margin: 10px 0;">
-                        <strong style="color: #155724;">✓ <?php esc_html_e( 'Auto-Detection Active', 'datalayer-manager' ); ?></strong><br>
-                        <?php esc_html_e( 'DataLayer variables are being automatically detected and injected on all frontend pages.', 'datalayer-manager' ); ?>
+                        <?php esc_html_e( 'The plugin automatically detects WordPress and WooCommerce data and injects it into the dataLayer on every page.', 'datalayer-manager' ); ?>
+                        <?php if ( ! $this->is_premium_active() ) : ?>
+                            <?php esc_html_e( 'Upgrade to Premium to add custom variables on a per-page basis.', 'datalayer-manager' ); ?>
+                            <a href="<?php echo esc_url( admin_url( 'options-general.php?page=datalayer-manager&screen=license' ) ); ?>" style="margin-left: 5px;">
+                                <?php esc_html_e( 'Learn More', 'datalayer-manager' ); ?>
+                            </a>
+                        <?php else : ?>
+                            <?php esc_html_e( 'You can also add custom variables on a per-page basis using the editor.', 'datalayer-manager' ); ?>
+                        <?php endif; ?>
                     </p>
                 </div>
 
@@ -146,6 +351,17 @@ class DataLayer_Manager {
                     </p>
 
                     <h3><?php esc_html_e( '2. Add Custom Variables (Premium Feature)', 'datalayer-manager' ); ?></h3>
+                    <?php if ( ! $this->is_premium_active() ) : ?>
+                        <div style="background: #fff3cd; border-left: 4px solid #ffc107; padding: 12px; margin: 15px 0;">
+                            <p style="margin: 0;">
+                                <strong><?php esc_html_e( 'Premium Feature:', 'datalayer-manager' ); ?></strong>
+                                <?php esc_html_e( 'This feature requires a premium license.', 'datalayer-manager' ); ?>
+                                <a href="<?php echo esc_url( admin_url( 'options-general.php?page=datalayer-manager&screen=license' ) ); ?>" style="margin-left: 10px;">
+                                    <?php esc_html_e( 'Activate License', 'datalayer-manager' ); ?>
+                                </a>
+                            </p>
+                        </div>
+                    <?php endif; ?>
                     <p><?php esc_html_e( 'To add custom variables for a specific page, post, or product:', 'datalayer-manager' ); ?></p>
                     <ol style="line-height: 1.8;">
                         <li>
@@ -219,7 +435,12 @@ class DataLayer_Manager {
                     <?php if ( $this->is_woocommerce_active() ) : ?>
                         <h3 style="margin-top: 30px;"><?php esc_html_e( 'WooCommerce Variables', 'datalayer-manager' ); ?></h3>
                         <p>
-                            <?php esc_html_e( 'These additional variables are available when WooCommerce is active:', 'datalayer-manager' ); ?>
+                            <?php esc_html_e( 'These additional variables are available when WooCommerce is active:', 'datalayer-manager' ); ?> 
+                            <?php if ( ! $this->is_premium_active() ) : ?>
+                                <a href="<?php echo esc_url( admin_url( 'options-general.php?page=datalayer-manager&screen=license' ) ); ?>" style="margin-left: 5px;">
+                                    <?php esc_html_e( 'Activate Premium', 'datalayer-manager' ); ?>
+                                </a>
+                            <?php endif; ?>
                         </p>
                         <table class="wp-list-table widefat fixed striped">
                             <thead>

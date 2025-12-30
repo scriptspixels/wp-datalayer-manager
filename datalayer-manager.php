@@ -193,13 +193,15 @@ function datalayer_manager_plugin_row_meta( $links, $file ) {
         return $links;
     }
 
-    // Add "License" link.
-    $license_link = sprintf(
-        '<a href="%s">%s</a>',
-        esc_url( admin_url( 'options-general.php?page=datalayer-manager&screen=license' ) ),
-        esc_html__( 'Activate License', 'datalayer-manager' )
-    );
-    $links[] = $license_link;
+    // Only show "Activate License" link if license is not active.
+    if ( ! datalayer_manager_is_premium() ) {
+        $license_link = sprintf(
+            '<a href="%s">%s</a>',
+            esc_url( admin_url( 'options-general.php?page=datalayer-manager&screen=license' ) ),
+            esc_html__( 'Activate License', 'datalayer-manager' )
+        );
+        $links[] = $license_link;
+    }
 
     return $links;
 }

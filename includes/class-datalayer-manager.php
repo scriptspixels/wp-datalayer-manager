@@ -37,14 +37,12 @@ class DataLayer_Manager {
         // Register admin menu.
         add_action( 'admin_menu', array( $this, 'register_admin_menu' ) );
         
-        // Register meta boxes for premium features (only if license is valid).
-        if ( $this->is_premium_active() ) {
-            add_action( 'add_meta_boxes', array( $this, 'register_meta_boxes' ) );
-            add_action( 'save_post', array( $this, 'save_meta_box' ), 10, 2 );
-            
-            // Customize meta boxes panel label in block editor.
-            add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_admin_scripts' ) );
-        }
+        // Register meta boxes (always show, but custom variables are premium).
+        add_action( 'add_meta_boxes', array( $this, 'register_meta_boxes' ) );
+        add_action( 'save_post', array( $this, 'save_meta_box' ), 10, 2 );
+        
+        // Customize meta boxes panel label in block editor.
+        add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_admin_scripts' ) );
         
         // Frontend injection.
         add_action( 'wp_head', array( $this, 'inject_datalayer' ), 1 );
@@ -1290,7 +1288,7 @@ class DataLayer_Manager {
         <div class="datalayer-manager-meta-box">
 
             <?php if ( ! empty( $auto_detected_variables ) ) : ?>
-                <div style="margin-bottom: 10px; padding-bottom: 15px; border-bottom: 1px solid #ddd;">
+                <div style="margin-bottom: 10px; padding-bottom: 15px;">
                     <p>
                         <strong><?php esc_html_e( 'Auto-Detected Variables', 'datalayer-manager' ); ?></strong>
                     </p>
@@ -1316,12 +1314,30 @@ class DataLayer_Manager {
                     </div>
                 </div>
             <?php endif; ?>
-            <p style="margin-top: 20px;">
-                <strong><?php esc_html_e( 'Custom Variables', 'datalayer-manager' ); ?></strong>
-            </p>
-            <p class="description">
-                <?php esc_html_e( 'Add custom dataLayer variables that will merge with auto-detected variables for this page.', 'datalayer-manager' ); ?>
-            </p>
+            
+            <div style="margin-top: 20px; padding-top: 15px; border-top: 1px solid #ddd;">
+                <p>
+                    <strong><?php esc_html_e( 'Custom Variables', 'datalayer-manager' ); ?></strong>
+                </p>
+                <p class="description">
+                    <?php esc_html_e( 'Add custom dataLayer variables that will merge with auto-detected variables for this page.', 'datalayer-manager' ); ?>
+                </p>
+                
+                <?php if ( ! $this->is_premium_active() ) : ?>
+                    <div style="background: #fff3cd; border-left: 4px solid #ffc107; padding: 12px; margin: 15px 0;">
+                        <p style="margin: 0 0 10px 0;">
+                            <strong><?php esc_html_e( 'Premium Feature', 'datalayer-manager' ); ?></strong>
+                        </p>
+                        <p style="margin: 0 0 10px 0;">
+                            <?php esc_html_e( 'Upgrade to Premium to add custom variables on any page, post, or product. Custom variables allow you to track campaign codes, affiliate IDs, and other custom data.', 'datalayer-manager' ); ?>
+                        </p>
+                        <p style="margin: 0;">
+                            <a href="<?php echo esc_url( admin_url( 'options-general.php?page=datalayer-manager&screen=license' ) ); ?>" class="button button-primary">
+                                <?php esc_html_e( 'Upgrade to Premium', 'datalayer-manager' ); ?>
+                            </a>
+                        </p>
+                    </div>
+                <?php else : ?>
             
             <div id="datalayer-custom-variables">
                 <?php if ( ! empty( $filtered_custom_variables ) ) : ?>
@@ -1370,13 +1386,16 @@ class DataLayer_Manager {
                 <?php endif; ?>
             </div>
             
-            <p style="margin-top: 15px;">
-                <button type="button" class="button button-secondary" id="add-datalayer-variable">
-                    <?php esc_html_e( '+ Add Variable', 'datalayer-manager' ); ?>
-                </button>
-            </p>
+                <p style="margin-top: 15px;">
+                    <button type="button" class="button button-secondary" id="add-datalayer-variable">
+                        <?php esc_html_e( '+ Add Variable', 'datalayer-manager' ); ?>
+                    </button>
+                </p>
+                
+                <input type="hidden" id="datalayer-auto-detected-keys" value="<?php echo esc_attr( wp_json_encode( $auto_detected_keys ) ); ?>" />
             
-            <input type="hidden" id="datalayer-auto-detected-keys" value="<?php echo esc_attr( wp_json_encode( $auto_detected_keys ) ); ?>" />
+                <?php endif; // End premium check. ?>
+            </div>
         </div>
         
         <script type="text/javascript">
@@ -1482,6 +1501,11 @@ class DataLayer_Manager {
 
         // Check user permissions.
         if ( ! current_user_can( 'edit_post', $post_id ) ) {
+            return;
+        }
+
+        // Only save custom variables if premium is active.
+        if ( ! $this->is_premium_active() ) {
             return;
         }
 

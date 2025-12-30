@@ -1,11 +1,11 @@
 <?php
 /**
  * Plugin Name: DataLayer Manager
- * Plugin URI: https://example.com/datalayer-manager
+ * Plugin URI: https://scriptsandpixels.studio
  * Description: Automatically detects WordPress context and injects dataLayer variables for analytics tools (e.g., GA4/GTM). No configuration needed - works automatically.
  * Version: 1.0.0
- * Author: Your Name
- * Author URI: https://example.com
+ * Author: Scripts + Pixels
+ * Author URI: https://scriptsandpixels.studio
  * License: GPL v2 or later
  * License URI: https://www.gnu.org/licenses/gpl-2.0.html
  * Text Domain: datalayer-manager

@@ -1,0 +1,425 @@
+# Copyright (C) 2025 Scripts + Pixels
+# This file is distributed under the same license as the DataLayer Manager plugin.
+msgid ""
+msgstr ""
+"Project-Id-Version: DataLayer Manager 1.0.0\n"
+"Report-Msgid-Bugs-To: https://scriptsandpixels.studio\n"
+"POT-Creation-Date: 2025-12-30 12:00+0000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=INTEGER; plural=EXPRESSION;\n"
+
+# Plugin header
+msgid "DataLayer Manager"
+msgstr ""
+
+msgid "Automatically detects WordPress context and injects dataLayer variables for analytics tools (GA4/GTM). Premium: Custom variables per page/post. No coding required."
+msgstr ""
+
+# Admin interface strings
+msgid "Settings"
+msgstr ""
+
+msgid "License"
+msgstr ""
+
+msgid "Activate License"
+msgstr ""
+
+msgid "DataLayer Variables"
+msgstr ""
+
+msgid "Auto-Detected Variables"
+msgstr ""
+
+msgid "Custom Variables"
+msgstr ""
+
+msgid "Premium Feature"
+msgstr ""
+
+msgid "Upgrade to Premium"
+msgstr ""
+
+msgid "+ Add Variable"
+msgstr ""
+
+msgid "Remove"
+msgstr ""
+
+msgid "String"
+msgstr ""
+
+msgid "Number"
+msgstr ""
+
+msgid "Boolean"
+msgstr ""
+
+msgid "Name"
+msgstr ""
+
+msgid "Value"
+msgstr ""
+
+msgid "Type"
+msgstr ""
+
+msgid "Actions"
+msgstr ""
+
+msgid "Overview"
+msgstr ""
+
+msgid "License Activation"
+msgstr ""
+
+msgid "License Key"
+msgstr ""
+
+msgid "License Status"
+msgstr ""
+
+msgid "Active"
+msgstr ""
+
+msgid "Invalid"
+msgstr ""
+
+msgid "Expired"
+msgstr ""
+
+msgid "Inactive"
+msgstr ""
+
+msgid "Not Activated"
+msgstr ""
+
+msgid "Deactivate License"
+msgstr ""
+
+msgid "Premium Features"
+msgstr ""
+
+msgid "What is DataLayer Manager?"
+msgstr ""
+
+msgid "Current Status"
+msgstr ""
+
+msgid "Where to Find DataLayer Variables"
+msgstr ""
+
+msgid "Available Auto-Detected Variables"
+msgstr ""
+
+msgid "How It Works"
+msgstr ""
+
+msgid "WordPress Default Variables"
+msgstr ""
+
+msgid "WooCommerce Variables"
+msgstr ""
+
+msgid "Enter your license key"
+msgstr ""
+
+msgid "Enter your premium license key. You can find this in your account dashboard after purchase."
+msgstr ""
+
+msgid "Your license key is not active. Please check your key or contact support."
+msgstr ""
+
+msgid "Activate your premium license to unlock custom variables and advanced features."
+msgstr ""
+
+msgid "With a premium license, you get access to:"
+msgstr ""
+
+msgid "Add custom variables on any page, post, or product"
+msgstr ""
+
+msgid "Visual editor in WordPress admin"
+msgstr ""
+
+msgid "Preview auto-detected variables before publishing"
+msgstr ""
+
+msgid "Priority support and updates"
+msgstr ""
+
+msgid "Get Premium License"
+msgstr ""
+
+msgid "Upgrade to Premium to add custom variables on any page, post, or product. Custom variables allow you to track campaign codes, affiliate IDs, and other custom data."
+msgstr ""
+
+msgid "These variables are automatically detected and locked. They cannot be modified."
+msgstr ""
+
+msgid "Add custom dataLayer variables that will merge with auto-detected variables for this page."
+msgstr ""
+
+msgid "No custom variables added yet. Click \"Add Variable\" to create one."
+msgstr ""
+
+msgid "This key is reserved for auto-detected variables and cannot be used."
+msgstr ""
+
+msgid "License activated successfully!"
+msgstr ""
+
+msgid "License deactivated successfully."
+msgstr ""
+
+msgid "License key is required."
+msgstr ""
+
+msgid "Error connecting to license server. Please try again later."
+msgstr ""
+
+msgid "Your license key has expired."
+msgstr ""
+
+msgid "Your license key has been revoked."
+msgstr ""
+
+msgid "Invalid license key."
+msgstr ""
+
+msgid "License is not active for this site."
+msgstr ""
+
+msgid "License key does not match this product."
+msgstr ""
+
+msgid "No activations left for this license key."
+msgstr ""
+
+msgid "Unknown error occurred."
+msgstr ""
+
+msgid "Test license activated successfully! (Test Mode)"
+msgstr ""
+
+msgid "Invalid test license key. Use: TEST-LICENSE-KEY-12345"
+msgstr ""
+
+msgid "No license key found."
+msgstr ""
+
+msgid "License deactivated locally. (Could not reach license server.)"
+msgstr ""
+
+msgid "You do not have permission to view this page."
+msgstr ""
+
+msgid "Auto-Detection Active"
+msgstr ""
+
+msgid "DataLayer variables are being automatically detected and injected on all frontend pages."
+msgstr ""
+
+msgid "Visit any page on your website (frontend, not admin)"
+msgstr ""
+
+msgid "Open your browser's Developer Tools:"
+msgstr ""
+
+msgid "Chrome/Edge: Press F12 or right-click → Inspect"
+msgstr ""
+
+msgid "Firefox: Press F12 or right-click → Inspect Element"
+msgstr ""
+
+msgid "Safari: Enable Developer menu in Preferences → Advanced, then press Cmd+Option+I"
+msgstr ""
+
+msgid "Go to the Console tab"
+msgstr ""
+
+msgid "Type the following command and press Enter:"
+msgstr ""
+
+msgid "You should see an array containing all the detected variables for the current page. Expand it to see individual variables and their values."
+msgstr ""
+
+msgid "Go to any post, page, or product edit screen in WordPress admin"
+msgstr ""
+
+msgid "Scroll down to the bottom of the editor"
+msgstr ""
+
+msgid "Look for the \"DataLayer Variables\" section (it may be collapsed - click to expand)"
+msgstr ""
+
+msgid "You'll see two sections:"
+msgstr ""
+
+msgid "Auto-Detected Variables:"
+msgstr ""
+
+msgid "These are automatically detected and cannot be edited. They show what variables will be available on this page."
+msgstr ""
+
+msgid "Custom Variables:"
+msgstr ""
+
+msgid "Add your own custom variables here. These will be merged with the auto-detected variables on the frontend."
+msgstr ""
+
+msgid "Click \"+ Add Variable\" to add a new custom variable"
+msgstr ""
+
+msgid "Enter a variable name (key), value, and select the type (string, number, or boolean)"
+msgstr ""
+
+msgid "Save or update your post/page/product to save the custom variables"
+msgstr ""
+
+msgid "Custom variable names cannot match auto-detected variable names. The plugin will prevent you from using reserved names."
+msgstr ""
+
+msgid "The following variables are automatically detected based on the page type and WordPress context. No configuration needed!"
+msgstr ""
+
+msgid "These additional variables are available when WooCommerce is active:"
+msgstr ""
+
+msgid "WooCommerce Not Active"
+msgstr ""
+
+msgid "Install and activate WooCommerce to enable e-commerce variable detection (product pricing, cart totals, checkout information, etc.)."
+msgstr ""
+
+msgid "DataLayer Manager uses WordPress hooks to automatically detect page context (page type, post information, categories, user status, etc.) and WooCommerce data (products, cart, checkout) when available. All detected variables are then injected into"
+msgstr ""
+
+msgid "method, which is the recommended approach for Google Tag Manager and Google Analytics 4."
+msgstr ""
+
+msgid "The dataLayer object is created automatically if it doesn't exist, so it works seamlessly with existing Google Tag Manager installations. Custom variables added via the editor are merged with auto-detected variables, with custom variables taking precedence if there are any conflicts."
+msgstr ""
+
+msgid "No coding required!"
+msgstr ""
+
+msgid "The plugin automatically detects WordPress and WooCommerce data and injects it into the dataLayer on every page."
+msgstr ""
+
+msgid "Upgrade to Premium to add custom variables on a per-page basis."
+msgstr ""
+
+msgid "Learn More"
+msgstr ""
+
+msgid "You can also add custom variables on a per-page basis using the editor."
+msgstr ""
+
+msgid "DataLayer Manager automatically creates and manages a dataLayer object for your WordPress site. This object contains structured data about your pages, posts, products, and user interactions that can be used by analytics tools like Google Tag Manager (GTM) and Google Analytics 4 (GA4)."
+msgstr ""
+
+msgid "Test Mode Active"
+msgstr ""
+
+msgid "Test mode is enabled. Use the test license key:"
+msgstr ""
+
+msgid "Variable Name"
+msgstr ""
+
+msgid "Description"
+msgstr ""
+
+msgid "Tip:"
+msgstr ""
+
+msgid "You can also use"
+msgstr ""
+
+msgid "to see just the first (most recent) dataLayer push."
+msgstr ""
+
+msgid "View Variables on the Frontend (Browser Console)"
+msgstr ""
+
+msgid "To see what variables are being detected on any page:"
+msgstr ""
+
+msgid "Add Custom Variables (Premium Feature)"
+msgstr ""
+
+msgid "To add custom variables for a specific page, post, or product:"
+msgstr ""
+
+msgid "This feature requires a premium license."
+msgstr ""
+
+msgid "DataLayer Manager requires WordPress %s or higher. Please update WordPress."
+msgstr ""
+
+msgid "DataLayer Manager requires PHP %s or higher. You are running PHP %s. Please contact your hosting provider to update PHP."
+msgstr ""
+
+msgid "DataLayer Manager could not be activated. Please check the requirements."
+msgstr ""
+
+msgid "Plugin Activation Error"
+msgstr ""
+
+msgid "DataLayer Manager License"
+msgstr ""
+
+msgid "View Current dataLayer"
+msgstr ""
+
+msgid "Current dataLayer"
+msgstr ""
+
+msgid "No active configuration found."
+msgstr ""
+
+msgid "No variables detected for the current page context."
+msgstr ""
+
+msgid "Edit via Draft"
+msgstr ""
+
+msgid "Version History"
+msgstr ""
+
+msgid "Create/Edit Draft"
+msgstr ""
+
+msgid "Published & Active"
+msgstr ""
+
+msgid "Draft Exists (Not Live)"
+msgstr ""
+
+msgid "No Active Configuration"
+msgstr ""
+
+msgid "How to View the DataLayer in Your Browser"
+msgstr ""
+
+msgid "You can also expand the array in the console to see individual variables and their values."
+msgstr ""
+
+msgid "Variables are automatically detected from WordPress context (page type, post info, categories, etc.) and injected into window.dataLayer on the frontend using the .push() method. No configuration needed - it works automatically."
+msgstr ""
+
+msgid "The following WordPress variables can be automatically detected:"
+msgstr ""
+
+msgid "The following WooCommerce variables can be automatically detected when WooCommerce is active:"
+msgstr ""
+
+msgid "WooCommerce is not currently active. Install and activate WooCommerce to enable e-commerce variable detection (product pricing, cart totals, checkout information, etc.)."
+msgstr ""

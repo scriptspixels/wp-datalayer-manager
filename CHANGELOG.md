@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [1.0.0] - 2025-01-XX
+## [1.0.0] - 2025-12-30
 
 ### Added
 - Automatic detection of WordPress context (page type, post info, categories, tags, etc.)
@@ -24,6 +24,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Minimum WordPress and PHP version checks
 - Internationalization support (textdomain loading)
 - Comprehensive documentation
+- **Premium Features:**
+  - Custom variables per page/post/product
+  - Visual editor in WordPress admin
+  - License management system
+  - Test mode for development
+- Meta box showing auto-detected variables (always visible)
+- Uninstall cleanup functionality
 
 ### Security
 - All inputs sanitized

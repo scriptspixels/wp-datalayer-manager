@@ -33,11 +33,14 @@ class DataLayer_Manager_License {
     private $status_option_name = 'datalayer_manager_license_status';
 
     /**
-     * License API endpoint (placeholder - replace with your actual endpoint).
+     * License API endpoint (your control layer).
+     * 
+     * Automatically detects local vs production environment.
+     * Can be overridden via DATALAYER_MANAGER_LICENSE_API_URL constant.
      *
      * @var string
      */
-    private $api_url = 'https://your-license-server.com/api/';
+    private $api_url = '';
 
     /**
      * Product ID/name for license validation.
@@ -75,6 +78,107 @@ class DataLayer_Manager_License {
         // Hook into WordPress.
         add_action( 'admin_init', array( $this, 'handle_license_action' ) );
         add_action( 'admin_notices', array( $this, 'show_license_notices' ) );
+    }
+
+    /**
+     * Get the license API endpoint URL based on environment.
+     * 
+     * Priority:
+     * 1. DATALAYER_MANAGER_LICENSE_API_URL constant (if defined)
+     * 2. Filter: datalayer_manager_license_api_url
+     * 3. Auto-detect based on environment (local vs production)
+     * 
+     * @return string API endpoint URL.
+     */
+    private function get_api_url() {
+        // Allow override via constant (highest priority).
+        if ( defined( 'DATALAYER_MANAGER_LICENSE_API_URL' ) ) {
+            return DATALAYER_MANAGER_LICENSE_API_URL;
+        }
+
+        // Allow override via filter.
+        $filtered_url = apply_filters( 'datalayer_manager_license_api_url', '' );
+        if ( ! empty( $filtered_url ) ) {
+            return $filtered_url;
+        }
+
+        // Auto-detect environment.
+        $is_local = $this->is_local_environment();
+
+        if ( $is_local ) {
+            // Local/development environment.
+            return 'http://scriptsandpixels.local/license-api/';
+        } else {
+            // Production environment.
+            return 'https://scriptsandpixels.studio/license-api/';
+        }
+    }
+
+    /**
+     * Check if we're in a local/development environment.
+     * 
+     * @return bool True if local environment, false otherwise.
+     */
+    private function is_local_environment() {
+        // Check for custom constant.
+        if ( defined( 'DATALAYER_MANAGER_LOCAL_MODE' ) ) {
+            return (bool) DATALAYER_MANAGER_LOCAL_MODE;
+        }
+
+        // Check WordPress environment type (WordPress 5.5+).
+        if ( defined( 'WP_ENVIRONMENT_TYPE' ) ) {
+            $env_type = WP_ENVIRONMENT_TYPE;
+            if ( in_array( $env_type, array( 'local', 'development' ), true ) ) {
+                return true;
+            }
+            if ( 'production' === $env_type ) {
+                return false;
+            }
+        }
+
+        // Check if WP_DEBUG is enabled (common in local environments).
+        if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
+            // But also check domain to avoid false positives.
+            $host = isset( $_SERVER['HTTP_HOST'] ) ? $_SERVER['HTTP_HOST'] : '';
+            if ( $this->is_local_domain( $host ) ) {
+                return true;
+            }
+        }
+
+        // Check domain for local patterns.
+        $host = isset( $_SERVER['HTTP_HOST'] ) ? $_SERVER['HTTP_HOST'] : '';
+        return $this->is_local_domain( $host );
+    }
+
+    /**
+     * Check if a domain is a local development domain.
+     * 
+     * @param string $host Hostname to check.
+     * @return bool True if local domain, false otherwise.
+     */
+    private function is_local_domain( $host ) {
+        if ( empty( $host ) ) {
+            return false;
+        }
+
+        // Common local development patterns.
+        $local_patterns = array(
+            'localhost',
+            '.local',
+            '.test',
+            '.dev',
+            '127.0.0.1',
+            '192.168.',
+            '10.0.',
+        );
+
+        foreach ( $local_patterns as $pattern ) {
+            if ( false !== strpos( $host, $pattern ) ) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
@@ -140,21 +244,24 @@ class DataLayer_Manager_License {
             return $this->validate_test_license( $license_key );
         }
 
-        // Prepare API request.
+        // Prepare API request for control layer.
         $api_params = array(
-            'edd_action' => 'check_license',
-            'license'    => $license_key,
-            'item_name'  => urlencode( $this->product_id ),
-            'url'        => home_url(),
+            'action'     => 'check',
+            'plugin'     => 'datalayer-manager',
+            'license_key' => $license_key,
+            'site_url'   => home_url(),
         );
 
-        // Make API request.
+        // Make API request (send as JSON).
         $response = wp_remote_post(
-            $this->api_url,
+            $this->get_api_url(),
             array(
                 'timeout'   => 15,
                 'sslverify' => true,
-                'body'      => $api_params,
+                'headers'   => array(
+                    'Content-Type' => 'application/json',
+                ),
+                'body'      => wp_json_encode( $api_params ),
             )
         );
 
@@ -165,16 +272,16 @@ class DataLayer_Manager_License {
             return false !== $cached ? $cached : 'none';
         }
 
-        // Parse response.
+        // Parse response from control layer.
         $license_data = json_decode( wp_remote_retrieve_body( $response ), true );
 
         // Check if response is valid.
-        if ( ! isset( $license_data['license'] ) ) {
+        if ( ! is_array( $license_data ) || ! isset( $license_data['status'] ) ) {
             return 'none';
         }
 
-        // Return status.
-        return $license_data['license'];
+        // Return status from control layer.
+        return $license_data['status'];
     }
 
     /**
@@ -230,21 +337,24 @@ class DataLayer_Manager_License {
             return $this->activate_test_license( $license_key );
         }
 
-        // Prepare API request.
+        // Prepare API request for control layer.
         $api_params = array(
-            'edd_action' => 'activate_license',
-            'license'    => $license_key,
-            'item_name'  => urlencode( $this->product_id ),
-            'url'        => home_url(),
+            'action'     => 'activate',
+            'plugin'     => 'datalayer-manager',
+            'license_key' => $license_key,
+            'site_url'   => home_url(),
         );
 
-        // Make API request.
+        // Make API request (send as JSON).
         $response = wp_remote_post(
-            $this->api_url,
+            $this->get_api_url(),
             array(
                 'timeout'   => 15,
                 'sslverify' => true,
-                'body'      => $api_params,
+                'headers'   => array(
+                    'Content-Type' => 'application/json',
+                ),
+                'body'      => wp_json_encode( $api_params ),
             )
         );
 
@@ -256,45 +366,69 @@ class DataLayer_Manager_License {
             );
         }
 
-        // Parse response.
-        $license_data = json_decode( wp_remote_retrieve_body( $response ), true );
+        // Get response body and code.
+        $response_body = wp_remote_retrieve_body( $response );
+        $response_code = wp_remote_retrieve_response_code( $response );
+
+        // Check HTTP status code (even if not a WP_Error, non-200 codes might indicate issues).
+        if ( $response_code < 200 || $response_code >= 300 ) {
+            // Still try to parse the response body in case it contains error details.
+            $error_data = json_decode( $response_body, true );
+            $error_message = isset( $error_data['message'] ) ? $error_data['message'] : __( 'License server returned an error.', 'datalayer-manager' );
+            
+            if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
+                error_log( 'DataLayer Manager License API Error - HTTP Code: ' . $response_code );
+                error_log( 'DataLayer Manager License API Error - Response: ' . $response_body );
+            }
+            
+            return array(
+                'success' => false,
+                'message' => $error_message,
+            );
+        }
+
+        // Parse response from control layer.
+        $license_data = json_decode( $response_body, true );
+
+        // Check if response is valid.
+        if ( ! is_array( $license_data ) ) {
+            // Log for debugging (remove in production if needed).
+            if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
+                error_log( 'DataLayer Manager License API Error - Response Code: ' . $response_code );
+                error_log( 'DataLayer Manager License API Error - Response Body: ' . $response_body );
+            }
+            
+            return array(
+                'success' => false,
+                'message' => __( 'Invalid response from license server.', 'datalayer-manager' ),
+            );
+        }
 
         // Check if activation was successful.
-        if ( isset( $license_data['license'] ) && 'valid' === $license_data['license'] ) {
+        if ( isset( $license_data['success'] ) && true === $license_data['success'] ) {
             // Save license key.
             update_option(
                 $this->option_name,
                 array(
-                    'key'      => $license_key,
+                    'key'       => $license_key,
                     'activated' => time(),
                 )
             );
 
             // Cache status.
-            $this->cache_status( 'valid' );
+            $status = isset( $license_data['status'] ) ? $license_data['status'] : 'valid';
+            $this->cache_status( $status );
+
+            // Use message from server or default.
+            $message = isset( $license_data['message'] ) ? $license_data['message'] : __( 'License activated successfully!', 'datalayer-manager' );
 
             return array(
                 'success' => true,
-                'message' => __( 'License activated successfully!', 'datalayer-manager' ),
+                'message' => $message,
             );
         } else {
-            // Get error message.
-            $error_message = isset( $license_data['error'] ) ? $license_data['error'] : __( 'Unknown error occurred.', 'datalayer-manager' );
-
-            // Map error codes to user-friendly messages.
-            $error_messages = array(
-                'expired'     => __( 'Your license key has expired.', 'datalayer-manager' ),
-                'revoked'     => __( 'Your license key has been revoked.', 'datalayer-manager' ),
-                'missing'     => __( 'Invalid license key.', 'datalayer-manager' ),
-                'invalid'     => __( 'Invalid license key.', 'datalayer-manager' ),
-                'site_inactive' => __( 'License is not active for this site.', 'datalayer-manager' ),
-                'item_name_mismatch' => __( 'License key does not match this product.', 'datalayer-manager' ),
-                'no_activations_left' => __( 'No activations left for this license key.', 'datalayer-manager' ),
-            );
-
-            if ( isset( $error_messages[ $error_message ] ) ) {
-                $error_message = $error_messages[ $error_message ];
-            }
+            // Get error message from server or use default.
+            $error_message = isset( $license_data['message'] ) ? $license_data['message'] : __( 'License activation failed.', 'datalayer-manager' );
 
             return array(
                 'success' => false,
@@ -352,21 +486,24 @@ class DataLayer_Manager_License {
             );
         }
 
-        // Prepare API request.
+        // Prepare API request for control layer.
         $api_params = array(
-            'edd_action' => 'deactivate_license',
-            'license'    => $license_key,
-            'item_name'  => urlencode( $this->product_id ),
-            'url'        => home_url(),
+            'action'     => 'deactivate',
+            'plugin'     => 'datalayer-manager',
+            'license_key' => $license_key,
+            'site_url'   => home_url(),
         );
 
-        // Make API request.
+        // Make API request (send as JSON).
         $response = wp_remote_post(
-            $this->api_url,
+            $this->get_api_url(),
             array(
                 'timeout'   => 15,
                 'sslverify' => true,
-                'body'      => $api_params,
+                'headers'   => array(
+                    'Content-Type' => 'application/json',
+                ),
+                'body'      => wp_json_encode( $api_params ),
             )
         );
 
@@ -501,11 +638,15 @@ class DataLayer_Manager_License {
 
     /**
      * Set API URL (for testing or custom endpoints).
+     * 
+     * Note: This sets the URL via filter, which takes precedence over auto-detection.
      *
      * @param string $url API URL.
      */
     public function set_api_url( $url ) {
-        $this->api_url = $url;
+        add_filter( 'datalayer_manager_license_api_url', function() use ( $url ) {
+            return $url;
+        }, 999 );
     }
 
     /**

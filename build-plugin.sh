@@ -6,14 +6,25 @@
 PLUGIN_NAME="datalayer-manager"
 PLUGIN_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 BUILD_DIR="$PLUGIN_DIR/build"
-ZIP_NAME="${PLUGIN_NAME}.zip"
+PLUGIN_FILE="$PLUGIN_DIR/${PLUGIN_NAME}.php"
+
+# Extract version from plugin header
+VERSION=$(grep -i "Version:" "$PLUGIN_FILE" | head -1 | sed -e 's/.*[Vv]ersion:[[:space:]]*\([0-9.]*\).*/\1/' | tr -d '\r\n ')
+
+# Validate version was found
+if [ -z "$VERSION" ]; then
+    echo "Error: Could not extract version from plugin header."
+    exit 1
+fi
+
+ZIP_NAME="${PLUGIN_NAME}-${VERSION}.zip"
 
 # Colors for output
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 NC='\033[0m' # No Color
 
-echo -e "${GREEN}Building ${PLUGIN_NAME} plugin...${NC}"
+echo -e "${GREEN}Building ${PLUGIN_NAME} plugin v${VERSION}...${NC}"
 
 # Clean previous builds
 if [ -d "$BUILD_DIR" ]; then
@@ -58,6 +69,7 @@ rm -rf "$BUILD_DIR"
 
 echo -e "${GREEN}✓ Build complete!${NC}"
 echo -e "${YELLOW}Plugin zip: $PLUGIN_DIR/$ZIP_NAME${NC}"
+echo -e "${YELLOW}Version: ${VERSION}${NC}"
 echo ""
 echo "Files included:"
 echo "  - datalayer-manager.php (main plugin file)"

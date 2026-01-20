@@ -30,6 +30,11 @@ define( 'DATALAYER_MANAGER_PLUGIN_FILE', __FILE__ );
 define( 'DATALAYER_MANAGER_MIN_WP_VERSION', '5.0' );
 define( 'DATALAYER_MANAGER_MIN_PHP_VERSION', '7.4' );
 
+// Free version flag (set to true for WordPress.org version).
+if ( ! defined( 'DATALAYER_MANAGER_FREE_VERSION' ) ) {
+    define( 'DATALAYER_MANAGER_FREE_VERSION', false );
+}
+
 /**
  * Check minimum requirements before loading plugin.
  */
@@ -95,7 +100,12 @@ if ( ! datalayer_manager_check_requirements() ) {
 
 // Load plugin classes.
 require_once DATALAYER_MANAGER_PLUGIN_DIR . 'includes/class-capabilities.php';
-require_once DATALAYER_MANAGER_PLUGIN_DIR . 'includes/class-license-manager.php';
+
+// Only load license manager if not free version.
+if ( ! DATALAYER_MANAGER_FREE_VERSION ) {
+    require_once DATALAYER_MANAGER_PLUGIN_DIR . 'includes/class-license-manager.php';
+}
+
 require_once DATALAYER_MANAGER_PLUGIN_DIR . 'includes/class-datalayer-manager.php';
 
 /**
@@ -193,8 +203,8 @@ function datalayer_manager_plugin_row_meta( $links, $file ) {
         return $links;
     }
 
-    // Only show "Activate License" link if license is not active.
-    if ( ! datalayer_manager_is_premium() ) {
+    // Only show "Activate License" link if not free version and license is not active.
+    if ( ! DATALAYER_MANAGER_FREE_VERSION && ! datalayer_manager_is_premium() ) {
         $license_link = sprintf(
             '<a href="%s">%s</a>',
             esc_url( admin_url( 'options-general.php?page=datalayer-manager&screen=license' ) ),
@@ -213,6 +223,16 @@ add_filter( 'plugin_row_meta', 'datalayer_manager_plugin_row_meta', 10, 2 );
  * @return bool True if premium license is valid, false otherwise.
  */
 function datalayer_manager_is_premium() {
+    // Free version always returns false.
+    if ( DATALAYER_MANAGER_FREE_VERSION ) {
+        return false;
+    }
+    
+    // Check if license manager class exists (may not be loaded in free version).
+    if ( ! class_exists( 'DataLayer_Manager_License' ) ) {
+        return false;
+    }
+    
     static $license_manager = null;
     
     if ( null === $license_manager ) {

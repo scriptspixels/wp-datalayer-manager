@@ -334,7 +334,13 @@ class DataLayer_Manager {
                         <?php if ( DATALAYER_MANAGER_FREE_VERSION ) : ?>
                             <p style="font-size: 14px; padding: 10px; background: #e7f3ff; border-left: 4px solid #2271b1; margin: 10px 0;">
                                 <strong style="color: #135e96;">ℹ <?php esc_html_e( 'Free Version', 'datalayer-manager' ); ?></strong><br>
-                                <?php esc_html_e( 'You are using the free version with automatic dataLayer detection. Premium features like custom variables per page are available in the premium version.', 'datalayer-manager' ); ?>
+                                <?php
+                                printf(
+                                    /* translators: %s: Link to plugin website. */
+                                    esc_html__( 'You are using the free version with automatic dataLayer detection. Premium features like custom variables per page are available in the premium version. %s', 'datalayer-manager' ),
+                                    '<a href="' . esc_url( 'https://scriptsandpixels.studio' ) . '" target="_blank" rel="noopener noreferrer">' . esc_html__( 'Learn more', 'datalayer-manager' ) . '</a>'
+                                );
+                                ?>
                             </p>
                         <?php else : ?>
                             <p style="font-size: 14px; padding: 10px; background: #fff3cd; border-left: 4px solid #ffc107; margin: 10px 0;">
@@ -415,9 +421,11 @@ class DataLayer_Manager {
                             <p style="margin: 0;">
                                 <strong><?php esc_html_e( 'Premium Feature:', 'datalayer-manager' ); ?></strong>
                                 <?php esc_html_e( 'This feature requires a premium license.', 'datalayer-manager' ); ?>
-                                <a href="<?php echo esc_url( admin_url( 'options-general.php?page=datalayer-manager&screen=license' ) ); ?>" style="margin-left: 10px;">
-                                    <?php esc_html_e( 'Activate License', 'datalayer-manager' ); ?>
-                                </a>
+                                <?php if ( ! DATALAYER_MANAGER_FREE_VERSION ) : ?>
+                                    <a href="<?php echo esc_url( admin_url( 'options-general.php?page=datalayer-manager&screen=license' ) ); ?>" style="margin-left: 10px;">
+                                        <?php esc_html_e( 'Activate License', 'datalayer-manager' ); ?>
+                                    </a>
+                                <?php endif; ?>
                             </p>
                         </div>
                     <?php endif; ?>
@@ -544,6 +552,18 @@ class DataLayer_Manager {
                     </p>
                 </div>
 
+            </div>
+
+            <!-- Footer Signature -->
+            <div style="margin-top: 40px; padding-top: 20px; border-top: 1px solid #ddd; text-align: center; color: #666; font-size: 12px;">
+                <?php
+                printf(
+                    /* translators: %1$s: Plugin version, %2$s: Link to author website, %3$s: Author name. */
+                    esc_html__( 'DataLayer Manager version %1$s by %2$s', 'datalayer-manager' ),
+                    esc_html( DATALAYER_MANAGER_VERSION ),
+                    '<a href="' . esc_url( 'https://scriptsandpixels.studio' ) . '" target="_blank" rel="noopener noreferrer">' . esc_html__( 'Scripts + Pixels', 'datalayer-manager' ) . '</a>'
+                );
+                ?>
             </div>
         </div>
         <?php
@@ -1391,7 +1411,13 @@ class DataLayer_Manager {
                             <strong><?php esc_html_e( 'Premium Feature', 'datalayer-manager' ); ?></strong>
                         </p>
                         <p style="margin: 0 0 10px 0;">
-                            <?php esc_html_e( 'Custom variables allow you to add page-specific dataLayer variables for tracking campaign codes, affiliate IDs, and other custom data. This feature is available in the premium version.', 'datalayer-manager' ); ?>
+                            <?php
+                            printf(
+                                /* translators: %s: Link to plugin website. */
+                                esc_html__( 'Custom variables allow you to add page-specific dataLayer variables for tracking campaign codes, affiliate IDs, and other custom data. This feature is available in the premium version. %s', 'datalayer-manager' ),
+                                '<a href="' . esc_url( 'https://scriptsandpixels.studio' ) . '" target="_blank" rel="noopener noreferrer">' . esc_html__( 'Learn more', 'datalayer-manager' ) . '</a>'
+                            );
+                            ?>
                         </p>
                         <?php if ( ! DATALAYER_MANAGER_FREE_VERSION ) : ?>
                             <p style="margin: 0;">

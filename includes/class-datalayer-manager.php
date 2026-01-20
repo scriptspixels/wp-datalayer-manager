@@ -268,6 +268,7 @@ class DataLayer_Manager {
         }
 
         // Route to appropriate screen.
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Reading URL parameter for routing, not processing form data.
         $screen = isset( $_GET['screen'] ) ? sanitize_text_field( wp_unslash( $_GET['screen'] ) ) : 'overview';
 
         switch ( $screen ) {
@@ -933,35 +934,36 @@ class DataLayer_Manager {
         // Product page detection.
         if ( function_exists( 'is_product' ) && is_product() ) {
             $variables['pageType'] = 'product';
-            global $product;
+            global $product; // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- WooCommerce global.
+            $datalayer_product = $product; // Assign to prefixed variable.
             
-            if ( $product && is_a( $product, 'WC_Product' ) ) {
-                $variables['productId'] = $product->get_id();
-                $variables['productName'] = $product->get_name();
-                $variables['productSku'] = $product->get_sku();
-                $variables['productPrice'] = (float) $product->get_price();
-                $variables['productRegularPrice'] = (float) $product->get_regular_price();
-                $variables['productSalePrice'] = $product->get_sale_price() ? (float) $product->get_sale_price() : null;
-                $variables['productStockStatus'] = $product->get_stock_status();
-                $variables['productStockQuantity'] = $product->get_stock_quantity();
-                $variables['productType'] = $product->get_type();
-                $variables['productOnSale'] = $product->is_on_sale();
+            if ( $datalayer_product && is_a( $datalayer_product, 'WC_Product' ) ) {
+                $variables['productId'] = $datalayer_product->get_id();
+                $variables['productName'] = $datalayer_product->get_name();
+                $variables['productSku'] = $datalayer_product->get_sku();
+                $variables['productPrice'] = (float) $datalayer_product->get_price();
+                $variables['productRegularPrice'] = (float) $datalayer_product->get_regular_price();
+                $variables['productSalePrice'] = $datalayer_product->get_sale_price() ? (float) $datalayer_product->get_sale_price() : null;
+                $variables['productStockStatus'] = $datalayer_product->get_stock_status();
+                $variables['productStockQuantity'] = $datalayer_product->get_stock_quantity();
+                $variables['productType'] = $datalayer_product->get_type();
+                $variables['productOnSale'] = $datalayer_product->is_on_sale();
 
                 // Product categories (WooCommerce taxonomy).
-                $product_categories = wp_get_post_terms( $product->get_id(), 'product_cat', array( 'fields' => 'names' ) );
+                $product_categories = wp_get_post_terms( $datalayer_product->get_id(), 'product_cat', array( 'fields' => 'names' ) );
                 if ( ! empty( $product_categories ) && ! is_wp_error( $product_categories ) ) {
                     $variables['productCategory'] = $product_categories;
                 }
 
                 // Product tags (WooCommerce taxonomy).
-                $product_tags = wp_get_post_terms( $product->get_id(), 'product_tag', array( 'fields' => 'names' ) );
+                $product_tags = wp_get_post_terms( $datalayer_product->get_id(), 'product_tag', array( 'fields' => 'names' ) );
                 if ( ! empty( $product_tags ) && ! is_wp_error( $product_tags ) ) {
                     $variables['productTag'] = $product_tags;
                 }
 
                 // Product brand (if WooCommerce Brands plugin is active).
                 if ( taxonomy_exists( 'product_brand' ) ) {
-                    $product_brands = wp_get_post_terms( $product->get_id(), 'product_brand', array( 'fields' => 'names' ) );
+                    $product_brands = wp_get_post_terms( $datalayer_product->get_id(), 'product_brand', array( 'fields' => 'names' ) );
                     if ( ! empty( $product_brands ) && ! is_wp_error( $product_brands ) ) {
                         $variables['productBrand'] = $product_brands;
                     }
@@ -1006,13 +1008,13 @@ class DataLayer_Manager {
                 // Cart items.
                 $cart_items = array();
                 foreach ( $cart->get_cart() as $cart_item_key => $cart_item ) {
-                    $product = $cart_item['data'];
-                    if ( $product && is_a( $product, 'WC_Product' ) ) {
+                    $datalayer_product = $cart_item['data'];
+                    if ( $datalayer_product && is_a( $datalayer_product, 'WC_Product' ) ) {
                         $cart_items[] = array(
-                            'productId' => $product->get_id(),
-                            'productName' => $product->get_name(),
-                            'productSku' => $product->get_sku(),
-                            'productPrice' => (float) $product->get_price(),
+                            'productId' => $datalayer_product->get_id(),
+                            'productName' => $datalayer_product->get_name(),
+                            'productSku' => $datalayer_product->get_sku(),
+                            'productPrice' => (float) $datalayer_product->get_price(),
                             'quantity' => $cart_item['quantity'],
                             'lineTotal' => (float) $cart_item['line_total'],
                         );
@@ -1037,13 +1039,13 @@ class DataLayer_Manager {
                 // Checkout items.
                 $checkout_items = array();
                 foreach ( $cart->get_cart() as $cart_item_key => $cart_item ) {
-                    $product = $cart_item['data'];
-                    if ( $product && is_a( $product, 'WC_Product' ) ) {
+                    $datalayer_product = $cart_item['data'];
+                    if ( $datalayer_product && is_a( $datalayer_product, 'WC_Product' ) ) {
                         $checkout_items[] = array(
-                            'productId' => $product->get_id(),
-                            'productName' => $product->get_name(),
-                            'productSku' => $product->get_sku(),
-                            'productPrice' => (float) $product->get_price(),
+                            'productId' => $datalayer_product->get_id(),
+                            'productName' => $datalayer_product->get_name(),
+                            'productSku' => $datalayer_product->get_sku(),
+                            'productPrice' => (float) $datalayer_product->get_price(),
                             'quantity' => $cart_item['quantity'],
                             'lineTotal' => (float) $cart_item['line_total'],
                         );
@@ -1606,7 +1608,10 @@ class DataLayer_Manager {
         $custom_variables = array();
         
         if ( isset( $_POST['datalayer_variables'] ) && is_array( $_POST['datalayer_variables'] ) ) {
-            foreach ( $_POST['datalayer_variables'] as $var ) {
+            // Unslash and sanitize the POST array before processing.
+            $datalayer_variables = wp_unslash( $_POST['datalayer_variables'] ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Will sanitize individual values in loop.
+            
+            foreach ( $datalayer_variables as $var ) {
                 $key = isset( $var['key'] ) ? trim( sanitize_text_field( wp_unslash( $var['key'] ) ) ) : '';
                 $value = isset( $var['value'] ) ? trim( sanitize_text_field( wp_unslash( $var['value'] ) ) ) : '';
                 $type = isset( $var['type'] ) ? sanitize_text_field( wp_unslash( $var['type'] ) ) : 'string';
@@ -1766,36 +1771,36 @@ class DataLayer_Manager {
         
         // WooCommerce variables (if WooCommerce is active and this is a product).
         if ( $this->is_woocommerce_active() && 'product' === $post->post_type ) {
-            $product = wc_get_product( $post->ID );
-            if ( $product && is_a( $product, 'WC_Product' ) ) {
+            $datalayer_product = wc_get_product( $post->ID );
+            if ( $datalayer_product && is_a( $datalayer_product, 'WC_Product' ) ) {
                 $variables['pageType'] = 'product';
-                $variables['productId'] = $product->get_id();
-                $variables['productName'] = $product->get_name();
-                $variables['productSku'] = $product->get_sku();
-                $variables['productPrice'] = (float) $product->get_price();
-                $variables['productRegularPrice'] = (float) $product->get_regular_price();
-                $sale_price = $product->get_sale_price();
+                $variables['productId'] = $datalayer_product->get_id();
+                $variables['productName'] = $datalayer_product->get_name();
+                $variables['productSku'] = $datalayer_product->get_sku();
+                $variables['productPrice'] = (float) $datalayer_product->get_price();
+                $variables['productRegularPrice'] = (float) $datalayer_product->get_regular_price();
+                $sale_price = $datalayer_product->get_sale_price();
                 $variables['productSalePrice'] = $sale_price ? (float) $sale_price : null;
-                $variables['productStockStatus'] = $product->get_stock_status();
-                $variables['productStockQuantity'] = $product->get_stock_quantity();
-                $variables['productType'] = $product->get_type();
-                $variables['productOnSale'] = $product->is_on_sale();
+                $variables['productStockStatus'] = $datalayer_product->get_stock_status();
+                $variables['productStockQuantity'] = $datalayer_product->get_stock_quantity();
+                $variables['productType'] = $datalayer_product->get_type();
+                $variables['productOnSale'] = $datalayer_product->is_on_sale();
                 
                 // Product categories.
-                $product_categories = wp_get_post_terms( $product->get_id(), 'product_cat', array( 'fields' => 'names' ) );
+                $product_categories = wp_get_post_terms( $datalayer_product->get_id(), 'product_cat', array( 'fields' => 'names' ) );
                 if ( ! empty( $product_categories ) && ! is_wp_error( $product_categories ) ) {
                     $variables['productCategory'] = $product_categories;
                 }
                 
                 // Product tags.
-                $product_tags = wp_get_post_terms( $product->get_id(), 'product_tag', array( 'fields' => 'names' ) );
+                $product_tags = wp_get_post_terms( $datalayer_product->get_id(), 'product_tag', array( 'fields' => 'names' ) );
                 if ( ! empty( $product_tags ) && ! is_wp_error( $product_tags ) ) {
                     $variables['productTag'] = $product_tags;
                 }
                 
                 // Product brand (if WooCommerce Brands plugin is active).
                 if ( taxonomy_exists( 'product_brand' ) ) {
-                    $product_brands = wp_get_post_terms( $product->get_id(), 'product_brand', array( 'fields' => 'names' ) );
+                    $product_brands = wp_get_post_terms( $datalayer_product->get_id(), 'product_brand', array( 'fields' => 'names' ) );
                     if ( ! empty( $product_brands ) && ! is_wp_error( $product_brands ) ) {
                         $variables['productBrand'] = $product_brands;
                     }
@@ -1888,7 +1893,10 @@ class DataLayer_Manager {
             window.dataLayer = window.dataLayer || [];
             
             // Push variables to dataLayer using .push() method (best practice).
-            window.dataLayer.push(<?php echo $js_variables; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped - JSON is safe. ?>);
+            <?php
+            // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- wp_json_encode() output is safe for JSON in JavaScript context.
+            echo 'window.dataLayer.push(' . $js_variables . ');';
+            ?>
         } catch ( error ) {
             // Fail safely - avoid fatal JS errors.
             console.error( 'DataLayer Manager: Error injecting variables', error );

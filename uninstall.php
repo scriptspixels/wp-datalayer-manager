@@ -16,11 +16,13 @@ delete_option( 'datalayer_manager_license_status' );
 
 // Delete plugin options for multisite (if applicable).
 if ( is_multisite() ) {
-    global $wpdb;
-    $blog_ids = $wpdb->get_col( "SELECT blog_id FROM $wpdb->blogs" );
+    // Get all sites in the network.
+    // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Local variable, not global.
+    $datalayer_sites = get_sites( array( 'fields' => 'ids' ) );
     
-    foreach ( $blog_ids as $blog_id ) {
-        switch_to_blog( $blog_id );
+    // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Local variable in foreach loop, not global.
+    foreach ( $datalayer_sites as $datalayer_site_id ) {
+        switch_to_blog( $datalayer_site_id );
         delete_option( 'datalayer_manager_license' );
         delete_option( 'datalayer_manager_license_status' );
         restore_current_blog();

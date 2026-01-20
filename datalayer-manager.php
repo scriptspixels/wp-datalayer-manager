@@ -12,7 +12,6 @@
  * Domain Path: /languages
  * Requires at least: 5.0
  * Requires PHP: 7.4
- * Network: false
  *
  * @package DataLayer_Manager
  */
@@ -65,6 +64,7 @@ function datalayer_manager_wp_version_notice() {
         <p>
             <?php
             printf(
+                /* translators: %s: Minimum required WordPress version. */
                 esc_html__( 'DataLayer Manager requires WordPress %s or higher. Please update WordPress.', 'datalayer-manager' ),
                 esc_html( DATALAYER_MANAGER_MIN_WP_VERSION )
             );
@@ -83,7 +83,8 @@ function datalayer_manager_php_version_notice() {
         <p>
             <?php
             printf(
-                esc_html__( 'DataLayer Manager requires PHP %s or higher. You are running PHP %s. Please contact your hosting provider to update PHP.', 'datalayer-manager' ),
+                /* translators: %1$s: Minimum required PHP version, %2$s: Current PHP version. */
+                esc_html__( 'DataLayer Manager requires PHP %1$s or higher. You are running PHP %2$s. Please contact your hosting provider to update PHP.', 'datalayer-manager' ),
                 esc_html( DATALAYER_MANAGER_MIN_PHP_VERSION ),
                 esc_html( PHP_VERSION )
             );
@@ -110,15 +111,12 @@ require_once DATALAYER_MANAGER_PLUGIN_DIR . 'includes/class-datalayer-manager.ph
 
 /**
  * Load plugin textdomain for translations.
+ * Note: WordPress 4.6+ automatically loads plugin translations, so this is not needed.
+ * Kept for backward compatibility with older WordPress versions (if needed).
+ * For WordPress.org hosted plugins, translations are automatically loaded.
  */
-function datalayer_manager_load_textdomain() {
-    load_plugin_textdomain(
-        'datalayer-manager',
-        false,
-        dirname( plugin_basename( DATALAYER_MANAGER_PLUGIN_FILE ) ) . '/languages'
-    );
-}
-add_action( 'plugins_loaded', 'datalayer_manager_load_textdomain' );
+// Removed load_plugin_textdomain() - WordPress 4.6+ handles this automatically.
+// Translations will be automatically loaded by WordPress for plugins hosted on WordPress.org.
 
 /**
  * Plugin activation handler.

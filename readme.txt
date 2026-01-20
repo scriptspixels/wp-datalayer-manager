@@ -1,8 +1,8 @@
 === DataLayer Manager ===
 Contributors: scriptsandpixels
-Tags: analytics, google-analytics, google-tag-manager, gtm, ga4, datalayer, tracking, woocommerce
+Tags: datalayer, google-tag-manager, analytics, tracking, woocommerce
 Requires at least: 5.0
-Tested up to: 6.4
+Tested up to: 6.9
 Requires PHP: 7.4
 Stable tag: 1.0.0
 License: GPLv2 or later

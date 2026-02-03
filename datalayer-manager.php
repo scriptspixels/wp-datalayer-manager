@@ -1,7 +1,6 @@
 <?php
 /**
  * Plugin Name: DataLayer Manager
- * Plugin URI: https://scriptsandpixels.studio
  * Description: Automatically detects WordPress context and injects dataLayer variables for analytics tools (GA4/GTM). Premium: Custom variables per page/post. No coding required.
  * Version: 1.0.0
  * Author: Scripts + Pixels

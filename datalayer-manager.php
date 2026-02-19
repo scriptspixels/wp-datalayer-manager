@@ -7,7 +7,7 @@
  * Author URI: https://scriptsandpixels.studio
  * License: GPL v2 or later
  * License URI: https://www.gnu.org/licenses/gpl-2.0.html
- * Text Domain: datalayer-manager
+ * Text Domain: scripts-and-pixels-datalayer-manager
  * Domain Path: /languages
  * Requires at least: 5.0
  * Requires PHP: 7.4
@@ -28,9 +28,10 @@ define( 'DATALAYER_MANAGER_PLUGIN_FILE', __FILE__ );
 define( 'DATALAYER_MANAGER_MIN_WP_VERSION', '5.0' );
 define( 'DATALAYER_MANAGER_MIN_PHP_VERSION', '7.4' );
 
-// Free version flag (set to true for WordPress.org version).
+// Free version flag. If license file is missing (e.g. WP.org zip), run as free version so we never require the missing file.
+$datalayer_manager_license_file = plugin_dir_path( __FILE__ ) . 'includes/class-license-manager.php';
 if ( ! defined( 'DATALAYER_MANAGER_FREE_VERSION' ) ) {
-    define( 'DATALAYER_MANAGER_FREE_VERSION', false );
+    define( 'DATALAYER_MANAGER_FREE_VERSION', ! file_exists( $datalayer_manager_license_file ) );
 }
 
 /**
@@ -64,7 +65,7 @@ function datalayer_manager_wp_version_notice() {
             <?php
             printf(
                 /* translators: %s: Minimum required WordPress version. */
-                esc_html__( 'Scripts + Pixels DataLayer Manager requires WordPress %s or higher. Please update WordPress.', 'datalayer-manager' ),
+                esc_html__( 'Scripts + Pixels DataLayer Manager requires WordPress %s or higher. Please update WordPress.', 'scripts-and-pixels-datalayer-manager' ),
                 esc_html( DATALAYER_MANAGER_MIN_WP_VERSION )
             );
             ?>
@@ -83,7 +84,7 @@ function datalayer_manager_php_version_notice() {
             <?php
             printf(
                 /* translators: %1$s: Minimum required PHP version, %2$s: Current PHP version. */
-                esc_html__( 'Scripts + Pixels DataLayer Manager requires PHP %1$s or higher. You are running PHP %2$s. Please contact your hosting provider to update PHP.', 'datalayer-manager' ),
+                esc_html__( 'Scripts + Pixels DataLayer Manager requires PHP %1$s or higher. You are running PHP %2$s. Please contact your hosting provider to update PHP.', 'scripts-and-pixels-datalayer-manager' ),
                 esc_html( DATALAYER_MANAGER_MIN_PHP_VERSION ),
                 esc_html( PHP_VERSION )
             );
@@ -101,9 +102,9 @@ if ( ! datalayer_manager_check_requirements() ) {
 // Load plugin classes.
 require_once DATALAYER_MANAGER_PLUGIN_DIR . 'includes/class-capabilities.php';
 
-// Only load license manager if not free version.
-if ( ! DATALAYER_MANAGER_FREE_VERSION ) {
-    require_once DATALAYER_MANAGER_PLUGIN_DIR . 'includes/class-license-manager.php';
+// Only load license manager when not free version and file exists (Pro build).
+if ( ! DATALAYER_MANAGER_FREE_VERSION && file_exists( $datalayer_manager_license_file ) ) {
+    require_once $datalayer_manager_license_file;
 }
 
 require_once DATALAYER_MANAGER_PLUGIN_DIR . 'includes/class-datalayer-manager.php';
@@ -126,8 +127,8 @@ function datalayer_manager_activate() {
     if ( ! datalayer_manager_check_requirements() ) {
         deactivate_plugins( plugin_basename( DATALAYER_MANAGER_PLUGIN_FILE ) );
         wp_die(
-            esc_html__( 'Scripts + Pixels DataLayer Manager could not be activated. Please check the requirements.', 'datalayer-manager' ),
-            esc_html__( 'Plugin Activation Error', 'datalayer-manager' ),
+            esc_html__( 'Scripts + Pixels DataLayer Manager could not be activated. Please check the requirements.', 'scripts-and-pixels-datalayer-manager' ),
+            esc_html__( 'Plugin Activation Error', 'scripts-and-pixels-datalayer-manager' ),
             array( 'back_link' => true )
         );
     }
@@ -178,8 +179,8 @@ function datalayer_manager_plugin_action_links( $links ) {
     // Add settings link.
     $settings_link = sprintf(
         '<a href="%s">%s</a>',
-        esc_url( admin_url( 'options-general.php?page=datalayer-manager' ) ),
-        esc_html__( 'Settings', 'datalayer-manager' )
+        esc_url( admin_url( 'options-general.php?page=scripts-and-pixels-datalayer-manager' ) ),
+        esc_html__( 'Settings', 'scripts-and-pixels-datalayer-manager' )
     );
     array_unshift( $links, $settings_link );
 
@@ -204,8 +205,8 @@ function datalayer_manager_plugin_row_meta( $links, $file ) {
     if ( ! DATALAYER_MANAGER_FREE_VERSION && ! datalayer_manager_is_premium() ) {
         $license_link = sprintf(
             '<a href="%s">%s</a>',
-            esc_url( admin_url( 'options-general.php?page=datalayer-manager&screen=license' ) ),
-            esc_html__( 'Activate License', 'datalayer-manager' )
+            esc_url( admin_url( 'options-general.php?page=scripts-and-pixels-datalayer-manager&screen=license' ) ),
+            esc_html__( 'Activate License', 'scripts-and-pixels-datalayer-manager' )
         );
         $links[] = $license_link;
     }

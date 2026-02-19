@@ -1,9 +1,10 @@
 #!/bin/bash
 
-# Build script for DataLayer Manager Plugin
+# Build script for Scripts + Pixels DataLayer Manager (Pro/full version)
 # Creates a clean zip file ready for distribution
 
 PLUGIN_NAME="datalayer-manager"
+PLUGIN_SLUG="scripts-and-pixels-datalayer-manager"
 PLUGIN_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 BUILD_DIR="$PLUGIN_DIR/build"
 PLUGIN_FILE="$PLUGIN_DIR/${PLUGIN_NAME}.php"
@@ -17,14 +18,15 @@ if [ -z "$VERSION" ]; then
     exit 1
 fi
 
-ZIP_NAME="${PLUGIN_NAME}-${VERSION}.zip"
+# Zip filename uses public slug for consistency with plugin name and WP.org
+ZIP_NAME="${PLUGIN_SLUG}-${VERSION}.zip"
 
 # Colors for output
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 NC='\033[0m' # No Color
 
-echo -e "${GREEN}Building ${PLUGIN_NAME} plugin v${VERSION}...${NC}"
+echo -e "${GREEN}Building ${PLUGIN_SLUG} v${VERSION}...${NC}"
 
 # Clean previous builds
 if [ -d "$BUILD_DIR" ]; then

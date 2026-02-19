@@ -1,8 +1,8 @@
 # Copyright (C) 2025 Scripts + Pixels
-# This file is distributed under the same license as the DataLayer Manager plugin.
+# This file is distributed under the same license as the Scripts + Pixels DataLayer Manager plugin.
 msgid ""
 msgstr ""
-"Project-Id-Version: DataLayer Manager 1.0.0\n"
+"Project-Id-Version: Scripts + Pixels DataLayer Manager 1.0.0\n"
 "Report-Msgid-Bugs-To: https://scriptsandpixels.studio\n"
 "POT-Creation-Date: 2025-12-30 12:00+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
@@ -15,7 +15,7 @@ msgstr ""
 "Plural-Forms: nplurals=INTEGER; plural=EXPRESSION;\n"
 
 # Plugin header
-msgid "DataLayer Manager"
+msgid "Scripts + Pixels DataLayer Manager"
 msgstr ""
 
 msgid "Automatically detects WordPress context and injects dataLayer variables for analytics tools (GA4/GTM). Premium: Custom variables per page/post. No coding required."
@@ -106,7 +106,7 @@ msgstr ""
 msgid "Premium Features"
 msgstr ""
 
-msgid "What is DataLayer Manager?"
+msgid "What is Scripts + Pixels DataLayer Manager?"
 msgstr ""
 
 msgid "Current Status"
@@ -298,7 +298,7 @@ msgstr ""
 msgid "Install and activate WooCommerce to enable e-commerce variable detection (product pricing, cart totals, checkout information, etc.)."
 msgstr ""
 
-msgid "DataLayer Manager uses WordPress hooks to automatically detect page context (page type, post information, categories, user status, etc.) and WooCommerce data (products, cart, checkout) when available. All detected variables are then injected into"
+msgid "Scripts + Pixels DataLayer Manager uses WordPress hooks to automatically detect page context (page type, post information, categories, user status, etc.) and WooCommerce data (products, cart, checkout) when available. All detected variables are then injected into"
 msgstr ""
 
 msgid "method, which is the recommended approach for Google Tag Manager and Google Analytics 4."
@@ -322,7 +322,7 @@ msgstr ""
 msgid "You can also add custom variables on a per-page basis using the editor."
 msgstr ""
 
-msgid "DataLayer Manager automatically creates and manages a dataLayer object for your WordPress site. This object contains structured data about your pages, posts, products, and user interactions that can be used by analytics tools like Google Tag Manager (GTM) and Google Analytics 4 (GA4)."
+msgid "Scripts + Pixels DataLayer Manager automatically creates and manages a dataLayer object for your WordPress site. This object contains structured data about your pages, posts, products, and user interactions that can be used by analytics tools like Google Tag Manager (GTM) and Google Analytics 4 (GA4)."
 msgstr ""
 
 msgid "Test Mode Active"
@@ -361,19 +361,19 @@ msgstr ""
 msgid "This feature requires a premium license."
 msgstr ""
 
-msgid "DataLayer Manager requires WordPress %s or higher. Please update WordPress."
+msgid "Scripts + Pixels DataLayer Manager requires WordPress %s or higher. Please update WordPress."
 msgstr ""
 
-msgid "DataLayer Manager requires PHP %s or higher. You are running PHP %s. Please contact your hosting provider to update PHP."
+msgid "Scripts + Pixels DataLayer Manager requires PHP %s or higher. You are running PHP %s. Please contact your hosting provider to update PHP."
 msgstr ""
 
-msgid "DataLayer Manager could not be activated. Please check the requirements."
+msgid "Scripts + Pixels DataLayer Manager could not be activated. Please check the requirements."
 msgstr ""
 
 msgid "Plugin Activation Error"
 msgstr ""
 
-msgid "DataLayer Manager License"
+msgid "Scripts + Pixels DataLayer Manager License"
 msgstr ""
 
 msgid "View Current dataLayer"

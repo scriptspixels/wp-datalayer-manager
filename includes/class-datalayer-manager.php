@@ -102,10 +102,10 @@ class DataLayer_Manager {
      */
     public function register_admin_menu() {
         add_options_page(
-            __( 'Scripts + Pixels DataLayer Manager', 'datalayer-manager' ),
-            __( 'Scripts + Pixels DataLayer Manager', 'datalayer-manager' ),
+            __( 'Scripts + Pixels DataLayer Manager', 'scripts-and-pixels-datalayer-manager' ),
+            __( 'Scripts + Pixels DataLayer Manager', 'scripts-and-pixels-datalayer-manager' ),
             DataLayer_Manager_Capabilities::CAP_VIEW,
-            'datalayer-manager',
+            'scripts-and-pixels-datalayer-manager',
             array( $this, 'render_admin_page' )
         );
     }
@@ -116,18 +116,18 @@ class DataLayer_Manager {
     private function render_screen_license() {
         // Check capabilities.
         if ( ! current_user_can( 'manage_options' ) ) {
-            wp_die( esc_html__( 'You do not have permission to view this page.', 'datalayer-manager' ) );
+            wp_die( esc_html__( 'You do not have permission to view this page.', 'scripts-and-pixels-datalayer-manager' ) );
         }
 
         // Free version: redirect to overview.
         if ( DATALAYER_MANAGER_FREE_VERSION ) {
-            wp_safe_redirect( admin_url( 'options-general.php?page=datalayer-manager' ) );
+            wp_safe_redirect( admin_url( 'options-general.php?page=scripts-and-pixels-datalayer-manager' ) );
             exit;
         }
 
         $license_manager = $this->get_license_manager();
         if ( ! $license_manager ) {
-            wp_safe_redirect( admin_url( 'options-general.php?page=datalayer-manager' ) );
+            wp_safe_redirect( admin_url( 'options-general.php?page=scripts-and-pixels-datalayer-manager' ) );
             exit;
         }
         
@@ -140,11 +140,11 @@ class DataLayer_Manager {
             
             <!-- Navigation Tabs -->
             <nav class="nav-tab-wrapper" style="margin-bottom: 20px;">
-                <a href="<?php echo esc_url( admin_url( 'options-general.php?page=datalayer-manager' ) ); ?>" class="nav-tab">
-                    <?php esc_html_e( 'Overview', 'datalayer-manager' ); ?>
+                <a href="<?php echo esc_url( admin_url( 'options-general.php?page=scripts-and-pixels-datalayer-manager' ) ); ?>" class="nav-tab">
+                    <?php esc_html_e( 'Overview', 'scripts-and-pixels-datalayer-manager' ); ?>
                 </a>
-                <a href="<?php echo esc_url( admin_url( 'options-general.php?page=datalayer-manager&screen=license' ) ); ?>" class="nav-tab nav-tab-active">
-                    <?php esc_html_e( 'License', 'datalayer-manager' ); ?>
+                <a href="<?php echo esc_url( admin_url( 'options-general.php?page=scripts-and-pixels-datalayer-manager&screen=license' ) ); ?>" class="nav-tab nav-tab-active">
+                    <?php esc_html_e( 'License', 'scripts-and-pixels-datalayer-manager' ); ?>
                 </a>
             </nav>
 
@@ -152,26 +152,26 @@ class DataLayer_Manager {
                 <?php if ( defined( 'DATALAYER_MANAGER_TEST_MODE' ) && DATALAYER_MANAGER_TEST_MODE ) : ?>
                     <div class="notice notice-info" style="margin: 20px 0;">
                         <p>
-                            <strong><?php esc_html_e( 'Test Mode Active', 'datalayer-manager' ); ?></strong><br>
-                            <?php esc_html_e( 'Test mode is enabled. Use the test license key:', 'datalayer-manager' ); ?>
+                            <strong><?php esc_html_e( 'Test Mode Active', 'scripts-and-pixels-datalayer-manager' ); ?></strong><br>
+                            <?php esc_html_e( 'Test mode is enabled. Use the test license key:', 'scripts-and-pixels-datalayer-manager' ); ?>
                             <code style="background: #f0f0f0; padding: 2px 6px; border-radius: 3px;">TEST-LICENSE-KEY-12345</code>
                         </p>
                     </div>
                 <?php endif; ?>
                 
                 <div style="background: #fff; border: 1px solid #ccd0d4; box-shadow: 0 1px 1px rgba(0,0,0,.04); padding: 20px; margin: 20px 0;">
-                    <h2 style="margin-top: 0;"><?php esc_html_e( 'License Activation', 'datalayer-manager' ); ?></h2>
+                    <h2 style="margin-top: 0;"><?php esc_html_e( 'License Activation', 'scripts-and-pixels-datalayer-manager' ); ?></h2>
                     <p>
-                        <?php esc_html_e( 'Activate your premium license to unlock custom variables and advanced features.', 'datalayer-manager' ); ?>
+                        <?php esc_html_e( 'Activate your premium license to unlock custom variables and advanced features.', 'scripts-and-pixels-datalayer-manager' ); ?>
                     </p>
 
-                    <form method="post" action="<?php echo esc_url( admin_url( 'options-general.php?page=datalayer-manager&screen=license' ) ); ?>">
+                    <form method="post" action="<?php echo esc_url( admin_url( 'options-general.php?page=scripts-and-pixels-datalayer-manager&screen=license' ) ); ?>">
                         <?php wp_nonce_field( 'datalayer_manager_license_action', 'datalayer_manager_license_nonce' ); ?>
 
                         <table class="form-table">
                             <tr>
                                 <th scope="row">
-                                    <label for="datalayer_manager_license_key"><?php esc_html_e( 'License Key', 'datalayer-manager' ); ?></label>
+                                    <label for="datalayer_manager_license_key"><?php esc_html_e( 'License Key', 'scripts-and-pixels-datalayer-manager' ); ?></label>
                                 </th>
                                 <td>
                                     <input 
@@ -180,23 +180,23 @@ class DataLayer_Manager {
                                         name="datalayer_manager_license_key" 
                                         value="<?php echo esc_attr( $license_key ); ?>" 
                                         class="regular-text" 
-                                        placeholder="<?php esc_attr_e( 'Enter your license key', 'datalayer-manager' ); ?>"
+                                        placeholder="<?php esc_attr_e( 'Enter your license key', 'scripts-and-pixels-datalayer-manager' ); ?>"
                                     />
                                     <p class="description">
-                                        <?php esc_html_e( 'Enter your premium license key. You can find this in your account dashboard after purchase.', 'datalayer-manager' ); ?>
+                                        <?php esc_html_e( 'Enter your premium license key. You can find this in your account dashboard after purchase.', 'scripts-and-pixels-datalayer-manager' ); ?>
                                     </p>
                                 </td>
                             </tr>
                             <tr>
-                                <th scope="row"><?php esc_html_e( 'License Status', 'datalayer-manager' ); ?></th>
+                                <th scope="row"><?php esc_html_e( 'License Status', 'scripts-and-pixels-datalayer-manager' ); ?></th>
                                 <td>
                                     <?php
                                     $status_labels = array(
-                                        'valid'    => __( 'Active', 'datalayer-manager' ),
-                                        'invalid'  => __( 'Invalid', 'datalayer-manager' ),
-                                        'expired'  => __( 'Expired', 'datalayer-manager' ),
-                                        'inactive' => __( 'Inactive', 'datalayer-manager' ),
-                                        'none'     => __( 'Not Activated', 'datalayer-manager' ),
+                                        'valid'    => __( 'Active', 'scripts-and-pixels-datalayer-manager' ),
+                                        'invalid'  => __( 'Invalid', 'scripts-and-pixels-datalayer-manager' ),
+                                        'expired'  => __( 'Expired', 'scripts-and-pixels-datalayer-manager' ),
+                                        'inactive' => __( 'Inactive', 'scripts-and-pixels-datalayer-manager' ),
+                                        'none'     => __( 'Not Activated', 'scripts-and-pixels-datalayer-manager' ),
                                     );
 
                                     $status_label = isset( $status_labels[ $license_status ] ) ? $status_labels[ $license_status ] : ucfirst( $license_status );
@@ -215,7 +215,7 @@ class DataLayer_Manager {
                                     </span>
                                     <?php if ( 'valid' !== $license_status && ! empty( $license_key ) ) : ?>
                                         <p class="description">
-                                            <?php esc_html_e( 'Your license key is not active. Please check your key or contact support.', 'datalayer-manager' ); ?>
+                                            <?php esc_html_e( 'Your license key is not active. Please check your key or contact support.', 'scripts-and-pixels-datalayer-manager' ); ?>
                                         </p>
                                     <?php endif; ?>
                                 </td>
@@ -228,14 +228,14 @@ class DataLayer_Manager {
                                     type="submit" 
                                     name="datalayer_manager_deactivate_license" 
                                     class="button button-secondary" 
-                                    value="<?php esc_attr_e( 'Deactivate License', 'datalayer-manager' ); ?>"
+                                    value="<?php esc_attr_e( 'Deactivate License', 'scripts-and-pixels-datalayer-manager' ); ?>"
                                 />
                             <?php else : ?>
                                 <input 
                                     type="submit" 
                                     name="datalayer_manager_activate_license" 
                                     class="button button-primary" 
-                                    value="<?php esc_attr_e( 'Activate License', 'datalayer-manager' ); ?>"
+                                    value="<?php esc_attr_e( 'Activate License', 'scripts-and-pixels-datalayer-manager' ); ?>"
                                 />
                             <?php endif; ?>
                         </p>
@@ -243,18 +243,18 @@ class DataLayer_Manager {
                 </div>
 
                 <div style="background: #fff; border: 1px solid #ccd0d4; box-shadow: 0 1px 1px rgba(0,0,0,.04); padding: 20px; margin: 20px 0;">
-                    <h2 style="margin-top: 0;"><?php esc_html_e( 'Premium Features', 'datalayer-manager' ); ?></h2>
-                    <p><?php esc_html_e( 'With a premium license, you get access to:', 'datalayer-manager' ); ?></p>
+                    <h2 style="margin-top: 0;"><?php esc_html_e( 'Premium Features', 'scripts-and-pixels-datalayer-manager' ); ?></h2>
+                    <p><?php esc_html_e( 'With a premium license, you get access to:', 'scripts-and-pixels-datalayer-manager' ); ?></p>
                     <ul style="list-style-type: disc; margin-left: 30px;">
-                        <li><?php esc_html_e( 'Add custom variables on any page, post, or product', 'datalayer-manager' ); ?></li>
-                        <li><?php esc_html_e( 'Visual editor in WordPress admin', 'datalayer-manager' ); ?></li>
-                        <li><?php esc_html_e( 'Preview auto-detected variables before publishing', 'datalayer-manager' ); ?></li>
-                        <li><?php esc_html_e( 'Priority support and updates', 'datalayer-manager' ); ?></li>
+                        <li><?php esc_html_e( 'Add custom variables on any page, post, or product', 'scripts-and-pixels-datalayer-manager' ); ?></li>
+                        <li><?php esc_html_e( 'Visual editor in WordPress admin', 'scripts-and-pixels-datalayer-manager' ); ?></li>
+                        <li><?php esc_html_e( 'Preview auto-detected variables before publishing', 'scripts-and-pixels-datalayer-manager' ); ?></li>
+                        <li><?php esc_html_e( 'Priority support and updates', 'scripts-and-pixels-datalayer-manager' ); ?></li>
                     </ul>
                     <?php if ( 'valid' !== $license_status && ! DATALAYER_MANAGER_FREE_VERSION ) : ?>
                         <p>
-                            <a href="<?php echo esc_url( admin_url( 'options-general.php?page=datalayer-manager&screen=license' ) ); ?>" class="button button-primary">
-                                <?php esc_html_e( 'Activate License', 'datalayer-manager' ); ?>
+                            <a href="<?php echo esc_url( admin_url( 'options-general.php?page=scripts-and-pixels-datalayer-manager&screen=license' ) ); ?>" class="button button-primary">
+                                <?php esc_html_e( 'Activate License', 'scripts-and-pixels-datalayer-manager' ); ?>
                             </a>
                         </p>
                     <?php endif; ?>
@@ -272,7 +272,7 @@ class DataLayer_Manager {
         $can_view = DataLayer_Manager_Capabilities::current_user_can_view();
 
         if ( ! $can_view ) {
-            wp_die( esc_html__( 'You do not have permission to view this page.', 'datalayer-manager' ) );
+            wp_die( esc_html__( 'You do not have permission to view this page.', 'scripts-and-pixels-datalayer-manager' ) );
         }
 
         // Route to appropriate screen.
@@ -310,12 +310,12 @@ class DataLayer_Manager {
             
             <!-- Navigation Tabs -->
             <nav class="nav-tab-wrapper" style="margin-bottom: 20px;">
-                <a href="<?php echo esc_url( admin_url( 'options-general.php?page=datalayer-manager' ) ); ?>" class="nav-tab nav-tab-active">
-                    <?php esc_html_e( 'Overview', 'datalayer-manager' ); ?>
+                <a href="<?php echo esc_url( admin_url( 'options-general.php?page=scripts-and-pixels-datalayer-manager' ) ); ?>" class="nav-tab nav-tab-active">
+                    <?php esc_html_e( 'Overview', 'scripts-and-pixels-datalayer-manager' ); ?>
                 </a>
                 <?php if ( ! DATALAYER_MANAGER_FREE_VERSION ) : ?>
-                    <a href="<?php echo esc_url( admin_url( 'options-general.php?page=datalayer-manager&screen=license' ) ); ?>" class="nav-tab">
-                        <?php esc_html_e( 'License', 'datalayer-manager' ); ?>
+                    <a href="<?php echo esc_url( admin_url( 'options-general.php?page=scripts-and-pixels-datalayer-manager&screen=license' ) ); ?>" class="nav-tab">
+                        <?php esc_html_e( 'License', 'scripts-and-pixels-datalayer-manager' ); ?>
                     </a>
                 <?php endif; ?>
             </nav>
@@ -324,40 +324,40 @@ class DataLayer_Manager {
                 
                 <!-- Current Status Section -->
                 <div style="background: #fff; border: 1px solid #ccd0d4; box-shadow: 0 1px 1px rgba(0,0,0,.04); padding: 20px; margin: 20px 0;">
-                    <h2 style="margin-top: 0;"><?php esc_html_e( 'Current Status', 'datalayer-manager' ); ?></h2>
+                    <h2 style="margin-top: 0;"><?php esc_html_e( 'Current Status', 'scripts-and-pixels-datalayer-manager' ); ?></h2>
                     
                     <!-- Auto-Detection Status (Always Active - Free Feature) -->
                     <p style="font-size: 14px; padding: 10px; background: #d4edda; border-left: 4px solid #28a745; margin: 10px 0;">
-                        <strong style="color: #155724;">✓ <?php esc_html_e( 'Auto-Detection Active', 'datalayer-manager' ); ?></strong><br>
-                        <?php esc_html_e( 'DataLayer variables are being automatically detected and injected on all frontend pages.', 'datalayer-manager' ); ?>
+                        <strong style="color: #155724;">✓ <?php esc_html_e( 'Auto-Detection Active', 'scripts-and-pixels-datalayer-manager' ); ?></strong><br>
+                        <?php esc_html_e( 'DataLayer variables are being automatically detected and injected on all frontend pages.', 'scripts-and-pixels-datalayer-manager' ); ?>
                     </p>
                     
                     <!-- Premium License Status -->
                     <?php if ( $this->is_premium_active() ) : ?>
                         <p style="font-size: 14px; padding: 10px; background: #d4edda; border-left: 4px solid #28a745; margin: 10px 0;">
-                            <strong style="color: #155724;">✓ <?php esc_html_e( 'Premium License Active', 'datalayer-manager' ); ?></strong><br>
-                            <?php esc_html_e( 'You have access to all premium features, including custom variables on a per-page basis.', 'datalayer-manager' ); ?>
+                            <strong style="color: #155724;">✓ <?php esc_html_e( 'Premium License Active', 'scripts-and-pixels-datalayer-manager' ); ?></strong><br>
+                            <?php esc_html_e( 'You have access to all premium features, including custom variables on a per-page basis.', 'scripts-and-pixels-datalayer-manager' ); ?>
                         </p>
                     <?php else : ?>
                         <?php if ( DATALAYER_MANAGER_FREE_VERSION ) : ?>
                             <p style="font-size: 14px; padding: 10px; background: #e7f3ff; border-left: 4px solid #2271b1; margin: 10px 0;">
-                                <strong style="color: #135e96;">ℹ <?php esc_html_e( 'Free Version', 'datalayer-manager' ); ?></strong><br>
+                                <strong style="color: #135e96;">ℹ <?php esc_html_e( 'Free Version', 'scripts-and-pixels-datalayer-manager' ); ?></strong><br>
                                 <?php
                                 printf(
                                     /* translators: %s: Link to plugin website. */
-                                    esc_html__( 'You are using the free version with automatic dataLayer detection. Premium features like custom variables per page are available in the premium version. %s', 'datalayer-manager' ),
-                                    '<a href="' . esc_url( 'https://scriptsandpixels.studio' ) . '" target="_blank" rel="noopener noreferrer">' . esc_html__( 'Learn more', 'datalayer-manager' ) . '</a>'
+                                    esc_html__( 'You are using the free version with automatic dataLayer detection. Premium features like custom variables per page are available in the premium version. %s', 'scripts-and-pixels-datalayer-manager' ),
+                                    '<a href="' . esc_url( 'https://scriptsandpixels.studio' ) . '" target="_blank" rel="noopener noreferrer">' . esc_html__( 'Learn more', 'scripts-and-pixels-datalayer-manager' ) . '</a>'
                                 );
                                 ?>
                             </p>
                         <?php else : ?>
                             <p style="font-size: 14px; padding: 10px; background: #fff3cd; border-left: 4px solid #ffc107; margin: 10px 0;">
-                                <strong style="color: #856404;">⚠ <?php esc_html_e( 'Premium License Not Active', 'datalayer-manager' ); ?></strong><br>
-                                <?php esc_html_e( 'You are using the free version. ', 'datalayer-manager' ); ?>
-                                <a href="<?php echo esc_url( admin_url( 'options-general.php?page=datalayer-manager&screen=license' ) ); ?>">
-                                    <?php esc_html_e( 'Activate your license', 'datalayer-manager' ); ?>
+                                <strong style="color: #856404;">⚠ <?php esc_html_e( 'Premium License Not Active', 'scripts-and-pixels-datalayer-manager' ); ?></strong><br>
+                                <?php esc_html_e( 'You are using the free version. ', 'scripts-and-pixels-datalayer-manager' ); ?>
+                                <a href="<?php echo esc_url( admin_url( 'options-general.php?page=scripts-and-pixels-datalayer-manager&screen=license' ) ); ?>">
+                                    <?php esc_html_e( 'Activate your license', 'scripts-and-pixels-datalayer-manager' ); ?>
                                 </a>
-                                <?php esc_html_e( ' to unlock premium features.', 'datalayer-manager' ); ?>
+                                <?php esc_html_e( ' to unlock premium features.', 'scripts-and-pixels-datalayer-manager' ); ?>
                             </p>
                         <?php endif; ?>
                     <?php endif; ?>
@@ -365,135 +365,135 @@ class DataLayer_Manager {
                 
                 <!-- Introduction Section -->
                 <div style="background: #fff; border: 1px solid #ccd0d4; box-shadow: 0 1px 1px rgba(0,0,0,.04); padding: 20px; margin: 20px 0;">
-                    <h2 style="margin-top: 0;"><?php esc_html_e( 'What is Scripts + Pixels DataLayer Manager?', 'datalayer-manager' ); ?></h2>
+                    <h2 style="margin-top: 0;"><?php esc_html_e( 'What is Scripts + Pixels DataLayer Manager?', 'scripts-and-pixels-datalayer-manager' ); ?></h2>
                     <p style="font-size: 15px; line-height: 1.6;">
-                        <?php esc_html_e( 'Scripts + Pixels DataLayer Manager automatically creates and manages a dataLayer object for your WordPress site. This object contains structured data about your pages, posts, products, and user interactions that can be used by analytics tools like Google Tag Manager (GTM) and Google Analytics 4 (GA4).', 'datalayer-manager' ); ?>
+                        <?php esc_html_e( 'Scripts + Pixels DataLayer Manager automatically creates and manages a dataLayer object for your WordPress site. This object contains structured data about your pages, posts, products, and user interactions that can be used by analytics tools like Google Tag Manager (GTM) and Google Analytics 4 (GA4).', 'scripts-and-pixels-datalayer-manager' ); ?>
                     </p>
                     <p style="font-size: 15px; line-height: 1.6;">
-                        <strong><?php esc_html_e( 'No coding required!', 'datalayer-manager' ); ?></strong>
-                        <?php esc_html_e( 'The plugin automatically detects WordPress and WooCommerce data and injects it into the dataLayer on every page.', 'datalayer-manager' ); ?>
+                        <strong><?php esc_html_e( 'No coding required!', 'scripts-and-pixels-datalayer-manager' ); ?></strong>
+                        <?php esc_html_e( 'The plugin automatically detects WordPress and WooCommerce data and injects it into the dataLayer on every page.', 'scripts-and-pixels-datalayer-manager' ); ?>
                         <?php if ( ! $this->is_premium_active() ) : ?>
                             <?php if ( DATALAYER_MANAGER_FREE_VERSION ) : ?>
-                                <?php esc_html_e( 'Custom variables per page are available in the premium version.', 'datalayer-manager' ); ?>
+                                <?php esc_html_e( 'Custom variables per page are available in the premium version.', 'scripts-and-pixels-datalayer-manager' ); ?>
                             <?php else : ?>
-                                <?php esc_html_e( 'Upgrade to Premium to add custom variables on a per-page basis.', 'datalayer-manager' ); ?>
-                                <a href="<?php echo esc_url( admin_url( 'options-general.php?page=datalayer-manager&screen=license' ) ); ?>" style="margin-left: 5px;">
-                                    <?php esc_html_e( 'Learn More', 'datalayer-manager' ); ?>
+                                <?php esc_html_e( 'Upgrade to Premium to add custom variables on a per-page basis.', 'scripts-and-pixels-datalayer-manager' ); ?>
+                                <a href="<?php echo esc_url( admin_url( 'options-general.php?page=scripts-and-pixels-datalayer-manager&screen=license' ) ); ?>" style="margin-left: 5px;">
+                                    <?php esc_html_e( 'Learn More', 'scripts-and-pixels-datalayer-manager' ); ?>
                                 </a>
                             <?php endif; ?>
                         <?php else : ?>
-                            <?php esc_html_e( 'You can also add custom variables on a per-page basis using the editor.', 'datalayer-manager' ); ?>
+                            <?php esc_html_e( 'You can also add custom variables on a per-page basis using the editor.', 'scripts-and-pixels-datalayer-manager' ); ?>
                         <?php endif; ?>
                     </p>
                 </div>
 
                 <!-- Where to Find Variables Section -->
                 <div style="background: #fff; border: 1px solid #ccd0d4; box-shadow: 0 1px 1px rgba(0,0,0,.04); padding: 20px; margin: 20px 0;">
-                    <h2 style="margin-top: 0;"><?php esc_html_e( 'Where to Find DataLayer Variables', 'datalayer-manager' ); ?></h2>
+                    <h2 style="margin-top: 0;"><?php esc_html_e( 'Where to Find DataLayer Variables', 'scripts-and-pixels-datalayer-manager' ); ?></h2>
                     
-                    <h3><?php esc_html_e( '1. View Variables on the Frontend (Browser Console)', 'datalayer-manager' ); ?></h3>
-                    <p><?php esc_html_e( 'To see what variables are being detected on any page:', 'datalayer-manager' ); ?></p>
+                    <h3><?php esc_html_e( '1. View Variables on the Frontend (Browser Console)', 'scripts-and-pixels-datalayer-manager' ); ?></h3>
+                    <p><?php esc_html_e( 'To see what variables are being detected on any page:', 'scripts-and-pixels-datalayer-manager' ); ?></p>
                     <ol style="line-height: 1.8;">
                         <li>
-                            <?php esc_html_e( 'Visit any page on your website (frontend, not admin)', 'datalayer-manager' ); ?>
+                            <?php esc_html_e( 'Visit any page on your website (frontend, not admin)', 'scripts-and-pixels-datalayer-manager' ); ?>
                         </li>
                         <li>
-                            <?php esc_html_e( 'Open your browser\'s Developer Tools:', 'datalayer-manager' ); ?>
+                            <?php esc_html_e( 'Open your browser\'s Developer Tools:', 'scripts-and-pixels-datalayer-manager' ); ?>
                             <ul style="list-style-type: disc; margin-left: 30px; margin-top: 5px;">
-                                <li><?php esc_html_e( 'Chrome/Edge: Press F12 or right-click → Inspect', 'datalayer-manager' ); ?></li>
-                                <li><?php esc_html_e( 'Firefox: Press F12 or right-click → Inspect Element', 'datalayer-manager' ); ?></li>
-                                <li><?php esc_html_e( 'Safari: Enable Developer menu in Preferences → Advanced, then press Cmd+Option+I', 'datalayer-manager' ); ?></li>
+                                <li><?php esc_html_e( 'Chrome/Edge: Press F12 or right-click → Inspect', 'scripts-and-pixels-datalayer-manager' ); ?></li>
+                                <li><?php esc_html_e( 'Firefox: Press F12 or right-click → Inspect Element', 'scripts-and-pixels-datalayer-manager' ); ?></li>
+                                <li><?php esc_html_e( 'Safari: Enable Developer menu in Preferences → Advanced, then press Cmd+Option+I', 'scripts-and-pixels-datalayer-manager' ); ?></li>
                             </ul>
                         </li>
                         <li>
-                            <?php esc_html_e( 'Go to the Console tab', 'datalayer-manager' ); ?>
+                            <?php esc_html_e( 'Go to the Console tab', 'scripts-and-pixels-datalayer-manager' ); ?>
                         </li>
                         <li>
-                            <?php esc_html_e( 'Type the following command and press Enter:', 'datalayer-manager' ); ?>
+                            <?php esc_html_e( 'Type the following command and press Enter:', 'scripts-and-pixels-datalayer-manager' ); ?>
                             <div style="background: #f5f5f5; border: 1px solid #ddd; padding: 12px; margin: 10px 0; font-family: 'Courier New', monospace; border-radius: 4px;">
                                 <code style="font-size: 14px;">window.dataLayer</code>
                             </div>
                         </li>
                         <li>
-                            <?php esc_html_e( 'You should see an array containing all the detected variables for the current page. Expand it to see individual variables and their values.', 'datalayer-manager' ); ?>
+                            <?php esc_html_e( 'You should see an array containing all the detected variables for the current page. Expand it to see individual variables and their values.', 'scripts-and-pixels-datalayer-manager' ); ?>
                         </li>
                     </ol>
                     <p style="padding: 10px; background: #fff3cd; border-left: 4px solid #ffc107; margin: 15px 0;">
-                        <strong><?php esc_html_e( 'Tip:', 'datalayer-manager' ); ?></strong>
-                        <?php esc_html_e( 'You can also use', 'datalayer-manager' ); ?> <code>window.dataLayer[0]</code> <?php esc_html_e( 'to see just the first (most recent) dataLayer push.', 'datalayer-manager' ); ?>
+                        <strong><?php esc_html_e( 'Tip:', 'scripts-and-pixels-datalayer-manager' ); ?></strong>
+                        <?php esc_html_e( 'You can also use', 'scripts-and-pixels-datalayer-manager' ); ?> <code>window.dataLayer[0]</code> <?php esc_html_e( 'to see just the first (most recent) dataLayer push.', 'scripts-and-pixels-datalayer-manager' ); ?>
                     </p>
 
-                    <h3><?php esc_html_e( '2. Add Custom Variables (Premium Feature)', 'datalayer-manager' ); ?></h3>
+                    <h3><?php esc_html_e( '2. Add Custom Variables (Premium Feature)', 'scripts-and-pixels-datalayer-manager' ); ?></h3>
                     <?php if ( ! $this->is_premium_active() ) : ?>
                         <div style="background: #fff3cd; border-left: 4px solid #ffc107; padding: 12px; margin: 15px 0;">
                             <p style="margin: 0;">
-                                <strong><?php esc_html_e( 'Premium Feature:', 'datalayer-manager' ); ?></strong>
-                                <?php esc_html_e( 'This feature requires a premium license.', 'datalayer-manager' ); ?>
+                                <strong><?php esc_html_e( 'Premium Feature:', 'scripts-and-pixels-datalayer-manager' ); ?></strong>
+                                <?php esc_html_e( 'This feature requires a premium license.', 'scripts-and-pixels-datalayer-manager' ); ?>
                                 <?php if ( ! DATALAYER_MANAGER_FREE_VERSION ) : ?>
-                                    <a href="<?php echo esc_url( admin_url( 'options-general.php?page=datalayer-manager&screen=license' ) ); ?>" style="margin-left: 10px;">
-                                        <?php esc_html_e( 'Activate License', 'datalayer-manager' ); ?>
+                                    <a href="<?php echo esc_url( admin_url( 'options-general.php?page=scripts-and-pixels-datalayer-manager&screen=license' ) ); ?>" style="margin-left: 10px;">
+                                        <?php esc_html_e( 'Activate License', 'scripts-and-pixels-datalayer-manager' ); ?>
                                     </a>
                                 <?php endif; ?>
                             </p>
                         </div>
                     <?php endif; ?>
-                    <p><?php esc_html_e( 'To add custom variables for a specific page, post, or product:', 'datalayer-manager' ); ?></p>
+                    <p><?php esc_html_e( 'To add custom variables for a specific page, post, or product:', 'scripts-and-pixels-datalayer-manager' ); ?></p>
                     <ol style="line-height: 1.8;">
                         <li>
-                            <?php esc_html_e( 'Go to any post, page, or product edit screen in WordPress admin', 'datalayer-manager' ); ?>
+                            <?php esc_html_e( 'Go to any post, page, or product edit screen in WordPress admin', 'scripts-and-pixels-datalayer-manager' ); ?>
                         </li>
                         <li>
-                            <?php esc_html_e( 'Scroll down to the bottom of the editor', 'datalayer-manager' ); ?>
+                            <?php esc_html_e( 'Scroll down to the bottom of the editor', 'scripts-and-pixels-datalayer-manager' ); ?>
                         </li>
                         <li>
-                            <?php esc_html_e( 'Look for the "DataLayer Variables" section (it may be collapsed - click to expand)', 'datalayer-manager' ); ?>
+                            <?php esc_html_e( 'Look for the "DataLayer Variables" section (it may be collapsed - click to expand)', 'scripts-and-pixels-datalayer-manager' ); ?>
                         </li>
                         <li>
-                            <?php esc_html_e( 'You\'ll see two sections:', 'datalayer-manager' ); ?>
+                            <?php esc_html_e( 'You\'ll see two sections:', 'scripts-and-pixels-datalayer-manager' ); ?>
                             <ul style="list-style-type: disc; margin-left: 30px; margin-top: 5px;">
                                 <li>
-                                    <strong><?php esc_html_e( 'Auto-Detected Variables:', 'datalayer-manager' ); ?></strong>
-                                    <?php esc_html_e( 'These are automatically detected and cannot be edited. They show what variables will be available on this page.', 'datalayer-manager' ); ?>
+                                    <strong><?php esc_html_e( 'Auto-Detected Variables:', 'scripts-and-pixels-datalayer-manager' ); ?></strong>
+                                    <?php esc_html_e( 'These are automatically detected and cannot be edited. They show what variables will be available on this page.', 'scripts-and-pixels-datalayer-manager' ); ?>
                                 </li>
                                 <li>
-                                    <strong><?php esc_html_e( 'Custom Variables:', 'datalayer-manager' ); ?></strong>
-                                    <?php esc_html_e( 'Add your own custom variables here. These will be merged with the auto-detected variables on the frontend.', 'datalayer-manager' ); ?>
+                                    <strong><?php esc_html_e( 'Custom Variables:', 'scripts-and-pixels-datalayer-manager' ); ?></strong>
+                                    <?php esc_html_e( 'Add your own custom variables here. These will be merged with the auto-detected variables on the frontend.', 'scripts-and-pixels-datalayer-manager' ); ?>
                                 </li>
                             </ul>
                         </li>
                         <li>
-                            <?php esc_html_e( 'Click "+ Add Variable" to add a new custom variable', 'datalayer-manager' ); ?>
+                            <?php esc_html_e( 'Click "+ Add Variable" to add a new custom variable', 'scripts-and-pixels-datalayer-manager' ); ?>
                         </li>
                         <li>
-                            <?php esc_html_e( 'Enter a variable name (key), value, and select the type (string, number, or boolean)', 'datalayer-manager' ); ?>
+                            <?php esc_html_e( 'Enter a variable name (key), value, and select the type (string, number, or boolean)', 'scripts-and-pixels-datalayer-manager' ); ?>
                         </li>
                         <li>
-                            <?php esc_html_e( 'Save or update your post/page/product to save the custom variables', 'datalayer-manager' ); ?>
+                            <?php esc_html_e( 'Save or update your post/page/product to save the custom variables', 'scripts-and-pixels-datalayer-manager' ); ?>
                         </li>
                     </ol>
                     <p style="padding: 10px; background: #e7f3ff; border-left: 4px solid #2271b1; margin: 15px 0;">
-                        <strong><?php esc_html_e( 'Note:', 'datalayer-manager' ); ?></strong>
-                        <?php esc_html_e( 'Custom variable names cannot match auto-detected variable names. The plugin will prevent you from using reserved names.', 'datalayer-manager' ); ?>
+                        <strong><?php esc_html_e( 'Note:', 'scripts-and-pixels-datalayer-manager' ); ?></strong>
+                        <?php esc_html_e( 'Custom variable names cannot match auto-detected variable names. The plugin will prevent you from using reserved names.', 'scripts-and-pixels-datalayer-manager' ); ?>
                     </p>
                 </div>
 
                 <!-- Available Variables Section -->
                 <div style="background: #fff; border: 1px solid #ccd0d4; box-shadow: 0 1px 1px rgba(0,0,0,.04); padding: 20px; margin: 20px 0;">
-                    <h2 style="margin-top: 0;"><?php esc_html_e( 'Available Auto-Detected Variables', 'datalayer-manager' ); ?></h2>
+                    <h2 style="margin-top: 0;"><?php esc_html_e( 'Available Auto-Detected Variables', 'scripts-and-pixels-datalayer-manager' ); ?></h2>
                     <p>
-                        <?php esc_html_e( 'The following variables are automatically detected based on the page type and WordPress context. No configuration needed!', 'datalayer-manager' ); ?>
+                        <?php esc_html_e( 'The following variables are automatically detected based on the page type and WordPress context. No configuration needed!', 'scripts-and-pixels-datalayer-manager' ); ?>
                     </p>
 
-                    <h3><?php esc_html_e( 'WordPress Default Variables', 'datalayer-manager' ); ?></h3>
+                    <h3><?php esc_html_e( 'WordPress Default Variables', 'scripts-and-pixels-datalayer-manager' ); ?></h3>
                     <p>
-                        <?php esc_html_e( 'These variables are available on all WordPress sites:', 'datalayer-manager' ); ?>
+                        <?php esc_html_e( 'These variables are available on all WordPress sites:', 'scripts-and-pixels-datalayer-manager' ); ?>
                     </p>
                     <table class="wp-list-table widefat fixed striped">
                         <thead>
                             <tr>
-                                <th scope="col" style="width: 25%;"><?php esc_html_e( 'Variable Name', 'datalayer-manager' ); ?></th>
-                                <th scope="col" style="width: 20%;"><?php esc_html_e( 'Type', 'datalayer-manager' ); ?></th>
-                                <th scope="col" style="width: 55%;"><?php esc_html_e( 'Description', 'datalayer-manager' ); ?></th>
+                                <th scope="col" style="width: 25%;"><?php esc_html_e( 'Variable Name', 'scripts-and-pixels-datalayer-manager' ); ?></th>
+                                <th scope="col" style="width: 20%;"><?php esc_html_e( 'Type', 'scripts-and-pixels-datalayer-manager' ); ?></th>
+                                <th scope="col" style="width: 55%;"><?php esc_html_e( 'Description', 'scripts-and-pixels-datalayer-manager' ); ?></th>
                             </tr>
                         </thead>
                         <tbody>
@@ -508,21 +508,21 @@ class DataLayer_Manager {
                     </table>
 
                     <?php if ( $this->is_woocommerce_active() ) : ?>
-                        <h3 style="margin-top: 30px;"><?php esc_html_e( 'WooCommerce Variables', 'datalayer-manager' ); ?></h3>
+                        <h3 style="margin-top: 30px;"><?php esc_html_e( 'WooCommerce Variables', 'scripts-and-pixels-datalayer-manager' ); ?></h3>
                         <p>
-                            <?php esc_html_e( 'These additional variables are available when WooCommerce is active.', 'datalayer-manager' ); ?>
+                            <?php esc_html_e( 'These additional variables are available when WooCommerce is active.', 'scripts-and-pixels-datalayer-manager' ); ?>
                             <?php if ( ! $this->is_premium_active() && ! DATALAYER_MANAGER_FREE_VERSION ) : ?>
-                                <a href="<?php echo esc_url( admin_url( 'options-general.php?page=datalayer-manager&screen=license' ) ); ?>" style="margin-left: 5px;">
-                                    <?php esc_html_e( 'Activate Premium', 'datalayer-manager' ); ?>
+                                <a href="<?php echo esc_url( admin_url( 'options-general.php?page=scripts-and-pixels-datalayer-manager&screen=license' ) ); ?>" style="margin-left: 5px;">
+                                    <?php esc_html_e( 'Activate Premium', 'scripts-and-pixels-datalayer-manager' ); ?>
                                 </a>
                             <?php endif; ?>
                         </p>
                         <table class="wp-list-table widefat fixed striped">
                             <thead>
                                 <tr>
-                                    <th scope="col" style="width: 25%;"><?php esc_html_e( 'Variable Name', 'datalayer-manager' ); ?></th>
-                                    <th scope="col" style="width: 20%;"><?php esc_html_e( 'Type', 'datalayer-manager' ); ?></th>
-                                    <th scope="col" style="width: 55%;"><?php esc_html_e( 'Description', 'datalayer-manager' ); ?></th>
+                                    <th scope="col" style="width: 25%;"><?php esc_html_e( 'Variable Name', 'scripts-and-pixels-datalayer-manager' ); ?></th>
+                                    <th scope="col" style="width: 20%;"><?php esc_html_e( 'Type', 'scripts-and-pixels-datalayer-manager' ); ?></th>
+                                    <th scope="col" style="width: 55%;"><?php esc_html_e( 'Description', 'scripts-and-pixels-datalayer-manager' ); ?></th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -538,8 +538,8 @@ class DataLayer_Manager {
                     <?php else : ?>
                         <div class="notice notice-info" style="margin-top: 20px;">
                             <p>
-                                <strong><?php esc_html_e( 'WooCommerce Not Active', 'datalayer-manager' ); ?></strong><br>
-                                <?php esc_html_e( 'Install and activate WooCommerce to enable e-commerce variable detection (product pricing, cart totals, checkout information, etc.).', 'datalayer-manager' ); ?>
+                                <strong><?php esc_html_e( 'WooCommerce Not Active', 'scripts-and-pixels-datalayer-manager' ); ?></strong><br>
+                                <?php esc_html_e( 'Install and activate WooCommerce to enable e-commerce variable detection (product pricing, cart totals, checkout information, etc.).', 'scripts-and-pixels-datalayer-manager' ); ?>
                             </p>
                         </div>
                     <?php endif; ?>
@@ -547,16 +547,16 @@ class DataLayer_Manager {
 
                 <!-- How It Works Section -->
                 <div style="background: #fff; border: 1px solid #ccd0d4; box-shadow: 0 1px 1px rgba(0,0,0,.04); padding: 20px; margin: 20px 0;">
-                    <h2 style="margin-top: 0;"><?php esc_html_e( 'How It Works', 'datalayer-manager' ); ?></h2>
+                    <h2 style="margin-top: 0;"><?php esc_html_e( 'How It Works', 'scripts-and-pixels-datalayer-manager' ); ?></h2>
                     <p style="font-size: 14px; line-height: 1.8;">
-                        <?php esc_html_e( 'Scripts + Pixels DataLayer Manager uses WordPress hooks to automatically detect page context (page type, post information, categories, user status, etc.) and WooCommerce data (products, cart, checkout) when available. All detected variables are then injected into', 'datalayer-manager' ); ?>
+                        <?php esc_html_e( 'Scripts + Pixels DataLayer Manager uses WordPress hooks to automatically detect page context (page type, post information, categories, user status, etc.) and WooCommerce data (products, cart, checkout) when available. All detected variables are then injected into', 'scripts-and-pixels-datalayer-manager' ); ?>
                         <code>window.dataLayer</code>
-                        <?php esc_html_e( 'on every frontend page using the', 'datalayer-manager' ); ?>
+                        <?php esc_html_e( 'on every frontend page using the', 'scripts-and-pixels-datalayer-manager' ); ?>
                         <code>.push()</code>
-                        <?php esc_html_e( 'method, which is the recommended approach for Google Tag Manager and Google Analytics 4.', 'datalayer-manager' ); ?>
+                        <?php esc_html_e( 'method, which is the recommended approach for Google Tag Manager and Google Analytics 4.', 'scripts-and-pixels-datalayer-manager' ); ?>
                     </p>
                     <p style="font-size: 14px; line-height: 1.8;">
-                        <?php esc_html_e( 'The dataLayer object is created automatically if it doesn\'t exist, so it works seamlessly with existing Google Tag Manager installations. Custom variables added via the editor are merged with auto-detected variables, with custom variables taking precedence if there are any conflicts.', 'datalayer-manager' ); ?>
+                        <?php esc_html_e( 'The dataLayer object is created automatically if it doesn\'t exist, so it works seamlessly with existing Google Tag Manager installations. Custom variables added via the editor are merged with auto-detected variables, with custom variables taking precedence if there are any conflicts.', 'scripts-and-pixels-datalayer-manager' ); ?>
                     </p>
                 </div>
 
@@ -567,9 +567,9 @@ class DataLayer_Manager {
                 <?php
                 printf(
                     /* translators: %1$s: Plugin version, %2$s: Link to author website, %3$s: Author name. */
-                    esc_html__( 'Scripts + Pixels DataLayer Manager version %1$s by %2$s', 'datalayer-manager' ),
+                    esc_html__( 'Scripts + Pixels DataLayer Manager version %1$s by %2$s', 'scripts-and-pixels-datalayer-manager' ),
                     esc_html( DATALAYER_MANAGER_VERSION ),
-                    '<a href="' . esc_url( 'https://scriptsandpixels.studio' ) . '" target="_blank" rel="noopener noreferrer">' . esc_html__( 'Scripts + Pixels', 'datalayer-manager' ) . '</a>'
+                    '<a href="' . esc_url( 'https://scriptsandpixels.studio' ) . '" target="_blank" rel="noopener noreferrer">' . esc_html__( 'Scripts + Pixels', 'scripts-and-pixels-datalayer-manager' ) . '</a>'
                 );
                 ?>
             </div>
@@ -587,97 +587,97 @@ class DataLayer_Manager {
             array(
                 'name' => 'pageType',
                 'type' => 'string',
-                'description' => __( 'The type of page: "home", "blog", "post", "page", "category", "tag", "archive", "search", "404", or "other"', 'datalayer-manager' ),
+                'description' => __( 'The type of page: "home", "blog", "post", "page", "category", "tag", "archive", "search", "404", or "other"', 'scripts-and-pixels-datalayer-manager' ),
             ),
             array(
                 'name' => 'postType',
                 'type' => 'string',
-                'description' => __( 'The post type (e.g., "post", "page", custom post type). Only on single post pages.', 'datalayer-manager' ),
+                'description' => __( 'The post type (e.g., "post", "page", custom post type). Only on single post pages.', 'scripts-and-pixels-datalayer-manager' ),
             ),
             array(
                 'name' => 'postId',
                 'type' => 'number',
-                'description' => __( 'The ID of the post. Only on single post pages.', 'datalayer-manager' ),
+                'description' => __( 'The ID of the post. Only on single post pages.', 'scripts-and-pixels-datalayer-manager' ),
             ),
             array(
                 'name' => 'postTitle',
                 'type' => 'string',
-                'description' => __( 'The title of the post. Only on single post pages.', 'datalayer-manager' ),
+                'description' => __( 'The title of the post. Only on single post pages.', 'scripts-and-pixels-datalayer-manager' ),
             ),
             array(
                 'name' => 'postCategory',
                 'type' => 'array',
-                'description' => __( 'Array of category names assigned to the post. Only on single post pages if categories exist.', 'datalayer-manager' ),
+                'description' => __( 'Array of category names assigned to the post. Only on single post pages if categories exist.', 'scripts-and-pixels-datalayer-manager' ),
             ),
             array(
                 'name' => 'postTags',
                 'type' => 'array',
-                'description' => __( 'Array of tag names assigned to the post. Only on single post pages if tags exist.', 'datalayer-manager' ),
+                'description' => __( 'Array of tag names assigned to the post. Only on single post pages if tags exist.', 'scripts-and-pixels-datalayer-manager' ),
             ),
             array(
                 'name' => 'pageId',
                 'type' => 'number',
-                'description' => __( 'The ID of the page. Only on page pages.', 'datalayer-manager' ),
+                'description' => __( 'The ID of the page. Only on page pages.', 'scripts-and-pixels-datalayer-manager' ),
             ),
             array(
                 'name' => 'pageTitle',
                 'type' => 'string',
-                'description' => __( 'The title of the page. Only on page pages.', 'datalayer-manager' ),
+                'description' => __( 'The title of the page. Only on page pages.', 'scripts-and-pixels-datalayer-manager' ),
             ),
             array(
                 'name' => 'pageSlug',
                 'type' => 'string',
-                'description' => __( 'The URL slug of the page. Only on page pages.', 'datalayer-manager' ),
+                'description' => __( 'The URL slug of the page. Only on page pages.', 'scripts-and-pixels-datalayer-manager' ),
             ),
             array(
                 'name' => 'categoryName',
                 'type' => 'string',
-                'description' => __( 'The name of the category. Only on category archive pages.', 'datalayer-manager' ),
+                'description' => __( 'The name of the category. Only on category archive pages.', 'scripts-and-pixels-datalayer-manager' ),
             ),
             array(
                 'name' => 'categoryId',
                 'type' => 'number',
-                'description' => __( 'The ID of the category. Only on category archive pages.', 'datalayer-manager' ),
+                'description' => __( 'The ID of the category. Only on category archive pages.', 'scripts-and-pixels-datalayer-manager' ),
             ),
             array(
                 'name' => 'tagName',
                 'type' => 'string',
-                'description' => __( 'The name of the tag. Only on tag archive pages.', 'datalayer-manager' ),
+                'description' => __( 'The name of the tag. Only on tag archive pages.', 'scripts-and-pixels-datalayer-manager' ),
             ),
             array(
                 'name' => 'tagId',
                 'type' => 'number',
-                'description' => __( 'The ID of the tag. Only on tag archive pages.', 'datalayer-manager' ),
+                'description' => __( 'The ID of the tag. Only on tag archive pages.', 'scripts-and-pixels-datalayer-manager' ),
             ),
             array(
                 'name' => 'archiveType',
                 'type' => 'string',
-                'description' => __( 'The post type for post type archive pages. Only on post type archive pages.', 'datalayer-manager' ),
+                'description' => __( 'The post type for post type archive pages. Only on post type archive pages.', 'scripts-and-pixels-datalayer-manager' ),
             ),
             array(
                 'name' => 'searchQuery',
                 'type' => 'string',
-                'description' => __( 'The search query term. Only on search result pages.', 'datalayer-manager' ),
+                'description' => __( 'The search query term. Only on search result pages.', 'scripts-and-pixels-datalayer-manager' ),
             ),
             array(
                 'name' => 'userLoggedIn',
                 'type' => 'boolean',
-                'description' => __( 'Whether a user is currently logged in (true/false). Always present.', 'datalayer-manager' ),
+                'description' => __( 'Whether a user is currently logged in (true/false). Always present.', 'scripts-and-pixels-datalayer-manager' ),
             ),
             array(
                 'name' => 'userId',
                 'type' => 'number',
-                'description' => __( 'The ID of the logged-in user. Only present if user is logged in.', 'datalayer-manager' ),
+                'description' => __( 'The ID of the logged-in user. Only present if user is logged in.', 'scripts-and-pixels-datalayer-manager' ),
             ),
             array(
                 'name' => 'siteName',
                 'type' => 'string',
-                'description' => __( 'The name of the WordPress site. Always present.', 'datalayer-manager' ),
+                'description' => __( 'The name of the WordPress site. Always present.', 'scripts-and-pixels-datalayer-manager' ),
             ),
             array(
                 'name' => 'siteUrl',
                 'type' => 'string',
-                'description' => __( 'The URL of the WordPress site home page. Always present.', 'datalayer-manager' ),
+                'description' => __( 'The URL of the WordPress site home page. Always present.', 'scripts-and-pixels-datalayer-manager' ),
             ),
         );
     }
@@ -693,140 +693,140 @@ class DataLayer_Manager {
             array(
                 'name' => 'productId',
                 'type' => 'number',
-                'description' => __( 'WooCommerce product ID. Only on single product pages.', 'datalayer-manager' ),
+                'description' => __( 'WooCommerce product ID. Only on single product pages.', 'scripts-and-pixels-datalayer-manager' ),
             ),
             array(
                 'name' => 'productName',
                 'type' => 'string',
-                'description' => __( 'WooCommerce product name. Only on single product pages.', 'datalayer-manager' ),
+                'description' => __( 'WooCommerce product name. Only on single product pages.', 'scripts-and-pixels-datalayer-manager' ),
             ),
             array(
                 'name' => 'productSku',
                 'type' => 'string',
-                'description' => __( 'WooCommerce product SKU. Only on single product pages.', 'datalayer-manager' ),
+                'description' => __( 'WooCommerce product SKU. Only on single product pages.', 'scripts-and-pixels-datalayer-manager' ),
             ),
             array(
                 'name' => 'productPrice',
                 'type' => 'number',
-                'description' => __( 'WooCommerce product current price. Only on single product pages.', 'datalayer-manager' ),
+                'description' => __( 'WooCommerce product current price. Only on single product pages.', 'scripts-and-pixels-datalayer-manager' ),
             ),
             array(
                 'name' => 'productRegularPrice',
                 'type' => 'number',
-                'description' => __( 'WooCommerce product regular price. Only on single product pages.', 'datalayer-manager' ),
+                'description' => __( 'WooCommerce product regular price. Only on single product pages.', 'scripts-and-pixels-datalayer-manager' ),
             ),
             array(
                 'name' => 'productSalePrice',
                 'type' => 'number',
-                'description' => __( 'WooCommerce product sale price (null if not on sale). Only on single product pages.', 'datalayer-manager' ),
+                'description' => __( 'WooCommerce product sale price (null if not on sale). Only on single product pages.', 'scripts-and-pixels-datalayer-manager' ),
             ),
             array(
                 'name' => 'productStockStatus',
                 'type' => 'string',
-                'description' => __( 'WooCommerce product stock status (instock, outofstock, etc.). Only on single product pages.', 'datalayer-manager' ),
+                'description' => __( 'WooCommerce product stock status (instock, outofstock, etc.). Only on single product pages.', 'scripts-and-pixels-datalayer-manager' ),
             ),
             array(
                 'name' => 'productStockQuantity',
                 'type' => 'number',
-                'description' => __( 'WooCommerce product stock quantity. Only on single product pages.', 'datalayer-manager' ),
+                'description' => __( 'WooCommerce product stock quantity. Only on single product pages.', 'scripts-and-pixels-datalayer-manager' ),
             ),
             array(
                 'name' => 'productType',
                 'type' => 'string',
-                'description' => __( 'WooCommerce product type (simple, variable, grouped, etc.). Only on single product pages.', 'datalayer-manager' ),
+                'description' => __( 'WooCommerce product type (simple, variable, grouped, etc.). Only on single product pages.', 'scripts-and-pixels-datalayer-manager' ),
             ),
             array(
                 'name' => 'productOnSale',
                 'type' => 'boolean',
-                'description' => __( 'Whether WooCommerce product is on sale. Only on single product pages.', 'datalayer-manager' ),
+                'description' => __( 'Whether WooCommerce product is on sale. Only on single product pages.', 'scripts-and-pixels-datalayer-manager' ),
             ),
             array(
                 'name' => 'productCategory',
                 'type' => 'array',
-                'description' => __( 'Array of WooCommerce product category names. Only on single product pages if categories exist.', 'datalayer-manager' ),
+                'description' => __( 'Array of WooCommerce product category names. Only on single product pages if categories exist.', 'scripts-and-pixels-datalayer-manager' ),
             ),
             array(
                 'name' => 'productTag',
                 'type' => 'array',
-                'description' => __( 'Array of WooCommerce product tag names. Only on single product pages if tags exist.', 'datalayer-manager' ),
+                'description' => __( 'Array of WooCommerce product tag names. Only on single product pages if tags exist.', 'scripts-and-pixels-datalayer-manager' ),
             ),
             array(
                 'name' => 'productBrand',
                 'type' => 'array',
-                'description' => __( 'Array of product brand names (if WooCommerce Brands plugin is active). Only on single product pages.', 'datalayer-manager' ),
+                'description' => __( 'Array of product brand names (if WooCommerce Brands plugin is active). Only on single product pages.', 'scripts-and-pixels-datalayer-manager' ),
             ),
             // WooCommerce Page Type Variables.
             array(
                 'name' => 'pageType',
                 'type' => 'string',
-                'description' => __( 'WooCommerce page types: "shop", "product_category", "product_tag", "cart", "checkout", "account". Overrides standard WordPress pageType.', 'datalayer-manager' ),
+                'description' => __( 'WooCommerce page types: "shop", "product_category", "product_tag", "cart", "checkout", "account". Overrides standard WordPress pageType.', 'scripts-and-pixels-datalayer-manager' ),
             ),
             array(
                 'name' => 'productCategoryName',
                 'type' => 'string',
-                'description' => __( 'WooCommerce product category name. Only on product category archive pages.', 'datalayer-manager' ),
+                'description' => __( 'WooCommerce product category name. Only on product category archive pages.', 'scripts-and-pixels-datalayer-manager' ),
             ),
             array(
                 'name' => 'productCategoryId',
                 'type' => 'number',
-                'description' => __( 'WooCommerce product category ID. Only on product category archive pages.', 'datalayer-manager' ),
+                'description' => __( 'WooCommerce product category ID. Only on product category archive pages.', 'scripts-and-pixels-datalayer-manager' ),
             ),
             array(
                 'name' => 'productTagName',
                 'type' => 'string',
-                'description' => __( 'WooCommerce product tag name. Only on product tag archive pages.', 'datalayer-manager' ),
+                'description' => __( 'WooCommerce product tag name. Only on product tag archive pages.', 'scripts-and-pixels-datalayer-manager' ),
             ),
             array(
                 'name' => 'productTagId',
                 'type' => 'number',
-                'description' => __( 'WooCommerce product tag ID. Only on product tag archive pages.', 'datalayer-manager' ),
+                'description' => __( 'WooCommerce product tag ID. Only on product tag archive pages.', 'scripts-and-pixels-datalayer-manager' ),
             ),
             // WooCommerce Cart Variables.
             array(
                 'name' => 'cartTotal',
                 'type' => 'number',
-                'description' => __( 'WooCommerce cart total amount. Only on cart page.', 'datalayer-manager' ),
+                'description' => __( 'WooCommerce cart total amount. Only on cart page.', 'scripts-and-pixels-datalayer-manager' ),
             ),
             array(
                 'name' => 'cartSubtotal',
                 'type' => 'number',
-                'description' => __( 'WooCommerce cart subtotal amount. Only on cart page.', 'datalayer-manager' ),
+                'description' => __( 'WooCommerce cart subtotal amount. Only on cart page.', 'scripts-and-pixels-datalayer-manager' ),
             ),
             array(
                 'name' => 'cartItemCount',
                 'type' => 'number',
-                'description' => __( 'WooCommerce cart item count. Only on cart page.', 'datalayer-manager' ),
+                'description' => __( 'WooCommerce cart item count. Only on cart page.', 'scripts-and-pixels-datalayer-manager' ),
             ),
             array(
                 'name' => 'cartItemQuantity',
                 'type' => 'number',
-                'description' => __( 'WooCommerce cart total quantity. Only on cart page.', 'datalayer-manager' ),
+                'description' => __( 'WooCommerce cart total quantity. Only on cart page.', 'scripts-and-pixels-datalayer-manager' ),
             ),
             array(
                 'name' => 'cartItems',
                 'type' => 'array',
-                'description' => __( 'Array of WooCommerce cart items with productId, productName, productSku, productPrice, quantity, lineTotal. Only on cart page.', 'datalayer-manager' ),
+                'description' => __( 'Array of WooCommerce cart items with productId, productName, productSku, productPrice, quantity, lineTotal. Only on cart page.', 'scripts-and-pixels-datalayer-manager' ),
             ),
             // WooCommerce Checkout Variables.
             array(
                 'name' => 'checkoutTotal',
                 'type' => 'number',
-                'description' => __( 'WooCommerce checkout total amount. Only on checkout page.', 'datalayer-manager' ),
+                'description' => __( 'WooCommerce checkout total amount. Only on checkout page.', 'scripts-and-pixels-datalayer-manager' ),
             ),
             array(
                 'name' => 'checkoutSubtotal',
                 'type' => 'number',
-                'description' => __( 'WooCommerce checkout subtotal amount. Only on checkout page.', 'datalayer-manager' ),
+                'description' => __( 'WooCommerce checkout subtotal amount. Only on checkout page.', 'scripts-and-pixels-datalayer-manager' ),
             ),
             array(
                 'name' => 'checkoutItemCount',
                 'type' => 'number',
-                'description' => __( 'WooCommerce checkout item count. Only on checkout page.', 'datalayer-manager' ),
+                'description' => __( 'WooCommerce checkout item count. Only on checkout page.', 'scripts-and-pixels-datalayer-manager' ),
             ),
             array(
                 'name' => 'checkoutItems',
                 'type' => 'array',
-                'description' => __( 'Array of WooCommerce checkout items with productId, productName, productSku, productPrice, quantity, lineTotal. Only on checkout page.', 'datalayer-manager' ),
+                'description' => __( 'Array of WooCommerce checkout items with productId, productName, productSku, productPrice, quantity, lineTotal. Only on checkout page.', 'scripts-and-pixels-datalayer-manager' ),
             ),
         );
     }
@@ -841,40 +841,40 @@ class DataLayer_Manager {
 
         ?>
         <div class="wrap">
-            <h1><?php esc_html_e( 'Current dataLayer', 'datalayer-manager' ); ?></h1>
+            <h1><?php esc_html_e( 'Current dataLayer', 'scripts-and-pixels-datalayer-manager' ); ?></h1>
 
             <p>
-                <a href="<?php echo esc_url( admin_url( 'options-general.php?page=datalayer-manager' ) ); ?>" class="button">
-                    <?php esc_html_e( '← Back to Overview', 'datalayer-manager' ); ?>
+                <a href="<?php echo esc_url( admin_url( 'options-general.php?page=scripts-and-pixels-datalayer-manager' ) ); ?>" class="button">
+                    <?php esc_html_e( '← Back to Overview', 'scripts-and-pixels-datalayer-manager' ); ?>
                 </a>
             </p>
 
             <?php if ( empty( $variables ) ) : ?>
                 <div class="notice notice-info">
                     <p>
-                        <strong><?php esc_html_e( 'No Variables Detected', 'datalayer-manager' ); ?></strong>
+                        <strong><?php esc_html_e( 'No Variables Detected', 'scripts-and-pixels-datalayer-manager' ); ?></strong>
                     </p>
                     <p>
-                        <?php esc_html_e( 'No dataLayer variables were detected for the current context.', 'datalayer-manager' ); ?>
+                        <?php esc_html_e( 'No dataLayer variables were detected for the current context.', 'scripts-and-pixels-datalayer-manager' ); ?>
                     </p>
                 </div>
             <?php else : ?>
                 <div class="notice notice-info">
                     <p>
-                        <strong><?php esc_html_e( 'Auto-Detected Variables', 'datalayer-manager' ); ?></strong>
+                        <strong><?php esc_html_e( 'Auto-Detected Variables', 'scripts-and-pixels-datalayer-manager' ); ?></strong>
                     </p>
                     <p>
-                        <?php esc_html_e( 'These variables are automatically detected from WordPress context and injected on the frontend.', 'datalayer-manager' ); ?>
+                        <?php esc_html_e( 'These variables are automatically detected from WordPress context and injected on the frontend.', 'scripts-and-pixels-datalayer-manager' ); ?>
                     </p>
                 </div>
 
-                <h2><?php esc_html_e( 'Active Variables', 'datalayer-manager' ); ?></h2>
+                <h2><?php esc_html_e( 'Active Variables', 'scripts-and-pixels-datalayer-manager' ); ?></h2>
                 <table class="wp-list-table widefat fixed striped">
                     <thead>
                         <tr>
-                            <th scope="col" class="column-name"><?php esc_html_e( 'Name', 'datalayer-manager' ); ?></th>
-                            <th scope="col" class="column-value"><?php esc_html_e( 'Value', 'datalayer-manager' ); ?></th>
-                            <th scope="col" class="column-type"><?php esc_html_e( 'Type', 'datalayer-manager' ); ?></th>
+                            <th scope="col" class="column-name"><?php esc_html_e( 'Name', 'scripts-and-pixels-datalayer-manager' ); ?></th>
+                            <th scope="col" class="column-value"><?php esc_html_e( 'Value', 'scripts-and-pixels-datalayer-manager' ); ?></th>
+                            <th scope="col" class="column-type"><?php esc_html_e( 'Type', 'scripts-and-pixels-datalayer-manager' ); ?></th>
                         </tr>
                     </thead>
                     <tbody>
@@ -1251,7 +1251,7 @@ class DataLayer_Manager {
         }
 
         // Enqueue script to change meta boxes panel label (wp_add_inline_script for compliance).
-        $label = esc_js( __( 'Scripts + Pixels DataLayer Manager', 'datalayer-manager' ) );
+        $label = esc_js( __( 'Scripts + Pixels DataLayer Manager', 'scripts-and-pixels-datalayer-manager' ) );
         $label_script = "(function(){function changeMetaBoxesLabel(){var b=document.querySelector('.edit-post-meta-boxes-main__presenter button[aria-expanded]');if(b&&b.textContent.trim().includes('Meta Boxes')){b.innerHTML=b.innerHTML.replace(/Meta Boxes/g,'" . $label . "');}}changeMetaBoxesLabel();if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded',changeMetaBoxesLabel);}setTimeout(changeMetaBoxesLabel,500);setTimeout(changeMetaBoxesLabel,1000);setTimeout(changeMetaBoxesLabel,2000);if(typeof MutationObserver!=='undefined'){var o=new MutationObserver(function(){changeMetaBoxesLabel();});var t=document.querySelector('.edit-post-meta-boxes-main__presenter');if(t){o.observe(t,{childList:true,subtree:true,characterData:true});}}})();";
         wp_register_script( 'datalayer-manager-meta-box-label', '', array(), DATALAYER_MANAGER_VERSION, true );
         wp_enqueue_script( 'datalayer-manager-meta-box-label', '', array(), DATALAYER_MANAGER_VERSION, true );
@@ -1299,7 +1299,7 @@ class DataLayer_Manager {
         foreach ( $post_types as $post_type ) {
             add_meta_box(
                 'datalayer-manager-variables',
-                __( 'DataLayer Variables', 'datalayer-manager' ),
+                __( 'DataLayer Variables', 'scripts-and-pixels-datalayer-manager' ),
                 array( $this, 'render_meta_box' ),
                 $post_type,
                 'normal', // Use 'normal' context (bottom area) for better space
@@ -1343,10 +1343,10 @@ class DataLayer_Manager {
             <?php if ( ! empty( $auto_detected_variables ) ) : ?>
                 <div style="margin-bottom: 10px; padding-bottom: 15px;">
                     <p>
-                        <strong><?php esc_html_e( 'Auto-Detected Variables', 'datalayer-manager' ); ?></strong>
+                        <strong><?php esc_html_e( 'Auto-Detected Variables', 'scripts-and-pixels-datalayer-manager' ); ?></strong>
                     </p>
                     <p class="description" style="font-size: 12px; margin-top: 5px;">
-                        <?php esc_html_e( 'These variables are automatically detected and locked. They cannot be modified.', 'datalayer-manager' ); ?>
+                        <?php esc_html_e( 'These variables are automatically detected and locked. They cannot be modified.', 'scripts-and-pixels-datalayer-manager' ); ?>
                     </p>
                     <div style="background: #f5f5f5; padding: 10px; margin-top: 10px; border-radius: 3px; max-height: 200px; overflow-y: auto;">
                         <table style="width: 100%; border-collapse: collapse; font-size: 12px;">
@@ -1371,30 +1371,30 @@ class DataLayer_Manager {
             <?php if ( ! DATALAYER_MANAGER_FREE_VERSION ) : ?>
             <div style="margin-top: 20px; padding-top: 15px; border-top: 1px solid #ddd;">
                 <p>
-                    <strong><?php esc_html_e( 'Custom Variables', 'datalayer-manager' ); ?></strong>
+                    <strong><?php esc_html_e( 'Custom Variables', 'scripts-and-pixels-datalayer-manager' ); ?></strong>
                 </p>
                 <p class="description">
-                    <?php esc_html_e( 'Add custom dataLayer variables that will merge with auto-detected variables for this page.', 'datalayer-manager' ); ?>
+                    <?php esc_html_e( 'Add custom dataLayer variables that will merge with auto-detected variables for this page.', 'scripts-and-pixels-datalayer-manager' ); ?>
                 </p>
                 
                 <?php if ( ! $this->is_premium_active() ) : ?>
                     <div style="background: <?php echo DATALAYER_MANAGER_FREE_VERSION ? '#e7f3ff' : '#fff3cd'; ?>; border-left: 4px solid <?php echo DATALAYER_MANAGER_FREE_VERSION ? '#2271b1' : '#ffc107'; ?>; padding: 12px; margin: 15px 0;">
                         <p style="margin: 0 0 10px 0;">
-                            <strong><?php esc_html_e( 'Premium Feature', 'datalayer-manager' ); ?></strong>
+                            <strong><?php esc_html_e( 'Premium Feature', 'scripts-and-pixels-datalayer-manager' ); ?></strong>
                         </p>
                         <p style="margin: 0 0 10px 0;">
                             <?php
                             printf(
                                 /* translators: %s: Link to plugin website. */
-                                esc_html__( 'Custom variables allow you to add page-specific dataLayer variables for tracking campaign codes, affiliate IDs, and other custom data. This feature is available in the premium version. %s', 'datalayer-manager' ),
-                                '<a href="' . esc_url( 'https://scriptsandpixels.studio' ) . '" target="_blank" rel="noopener noreferrer">' . esc_html__( 'Learn more', 'datalayer-manager' ) . '</a>'
+                                esc_html__( 'Custom variables allow you to add page-specific dataLayer variables for tracking campaign codes, affiliate IDs, and other custom data. This feature is available in the premium version. %s', 'scripts-and-pixels-datalayer-manager' ),
+                                '<a href="' . esc_url( 'https://scriptsandpixels.studio' ) . '" target="_blank" rel="noopener noreferrer">' . esc_html__( 'Learn more', 'scripts-and-pixels-datalayer-manager' ) . '</a>'
                             );
                             ?>
                         </p>
                         <?php if ( ! DATALAYER_MANAGER_FREE_VERSION ) : ?>
                             <p style="margin: 0;">
-                                <a href="<?php echo esc_url( admin_url( 'options-general.php?page=datalayer-manager&screen=license' ) ); ?>" class="button button-primary">
-                                    <?php esc_html_e( 'Activate License', 'datalayer-manager' ); ?>
+                                <a href="<?php echo esc_url( admin_url( 'options-general.php?page=scripts-and-pixels-datalayer-manager&screen=license' ) ); ?>" class="button button-primary">
+                                    <?php esc_html_e( 'Activate License', 'scripts-and-pixels-datalayer-manager' ); ?>
                                 </a>
                             </p>
                         <?php endif; ?>
@@ -1406,10 +1406,10 @@ class DataLayer_Manager {
                     <table class="wp-list-table widefat fixed striped" style="margin-top: 10px;">
                         <thead>
                             <tr>
-                                <th style="width: 30%;"><?php esc_html_e( 'Name', 'datalayer-manager' ); ?></th>
-                                <th style="width: 40%;"><?php esc_html_e( 'Value', 'datalayer-manager' ); ?></th>
-                                <th style="width: 20%;"><?php esc_html_e( 'Type', 'datalayer-manager' ); ?></th>
-                                <th style="width: 10%;"><?php esc_html_e( 'Actions', 'datalayer-manager' ); ?></th>
+                                <th style="width: 30%;"><?php esc_html_e( 'Name', 'scripts-and-pixels-datalayer-manager' ); ?></th>
+                                <th style="width: 40%;"><?php esc_html_e( 'Value', 'scripts-and-pixels-datalayer-manager' ); ?></th>
+                                <th style="width: 20%;"><?php esc_html_e( 'Type', 'scripts-and-pixels-datalayer-manager' ); ?></th>
+                                <th style="width: 10%;"><?php esc_html_e( 'Actions', 'scripts-and-pixels-datalayer-manager' ); ?></th>
                             </tr>
                         </thead>
                         <tbody>
@@ -1428,13 +1428,13 @@ class DataLayer_Manager {
                                     </td>
                                     <td>
                                         <select name="datalayer_variables[<?php echo esc_attr( $index ); ?>][type]" class="regular-text">
-                                            <option value="string" <?php selected( $type, 'string' ); ?>><?php esc_html_e( 'String', 'datalayer-manager' ); ?></option>
-                                            <option value="number" <?php selected( $type, 'number' ); ?>><?php esc_html_e( 'Number', 'datalayer-manager' ); ?></option>
-                                            <option value="boolean" <?php selected( $type, 'boolean' ); ?>><?php esc_html_e( 'Boolean', 'datalayer-manager' ); ?></option>
+                                            <option value="string" <?php selected( $type, 'string' ); ?>><?php esc_html_e( 'String', 'scripts-and-pixels-datalayer-manager' ); ?></option>
+                                            <option value="number" <?php selected( $type, 'number' ); ?>><?php esc_html_e( 'Number', 'scripts-and-pixels-datalayer-manager' ); ?></option>
+                                            <option value="boolean" <?php selected( $type, 'boolean' ); ?>><?php esc_html_e( 'Boolean', 'scripts-and-pixels-datalayer-manager' ); ?></option>
                                         </select>
                                     </td>
                                     <td>
-                                        <button type="button" class="button button-small remove-variable-row"><?php esc_html_e( 'Remove', 'datalayer-manager' ); ?></button>
+                                        <button type="button" class="button button-small remove-variable-row"><?php esc_html_e( 'Remove', 'scripts-and-pixels-datalayer-manager' ); ?></button>
                                     </td>
                                 </tr>
                                 <?php $index++; ?>
@@ -1443,14 +1443,14 @@ class DataLayer_Manager {
                     </table>
                 <?php else : ?>
                     <p class="description" style="margin-top: 10px;">
-                        <?php esc_html_e( 'No custom variables added yet. Click "Add Variable" to create one.', 'datalayer-manager' ); ?>
+                        <?php esc_html_e( 'No custom variables added yet. Click "Add Variable" to create one.', 'scripts-and-pixels-datalayer-manager' ); ?>
                     </p>
                 <?php endif; ?>
             </div>
             
                 <p style="margin-top: 15px;">
                     <button type="button" class="button button-secondary" id="add-datalayer-variable">
-                        <?php esc_html_e( '+ Add Variable', 'datalayer-manager' ); ?>
+                        <?php esc_html_e( '+ Add Variable', 'scripts-and-pixels-datalayer-manager' ); ?>
                     </button>
                 </p>
                 
@@ -1458,21 +1458,21 @@ class DataLayer_Manager {
             
                 <?php
                 // Inline script via wp_add_inline_script for compliance.
-                $reserved_msg = esc_js( __( 'This key is reserved for auto-detected variables and cannot be used.', 'datalayer-manager' ) );
-                $l_name       = esc_js( __( 'Name', 'datalayer-manager' ) );
-                $l_value      = esc_js( __( 'Value', 'datalayer-manager' ) );
-                $l_type       = esc_js( __( 'Type', 'datalayer-manager' ) );
-                $l_actions    = esc_js( __( 'Actions', 'datalayer-manager' ) );
-                $l_string     = esc_js( __( 'String', 'datalayer-manager' ) );
-                $l_number     = esc_js( __( 'Number', 'datalayer-manager' ) );
-                $l_boolean    = esc_js( __( 'Boolean', 'datalayer-manager' ) );
-                $l_remove     = esc_js( __( 'Remove', 'datalayer-manager' ) );
-                $meta_box_js  = "(function($){$(document).ready(function(){var autoDetectedKeys=[];try{autoDetectedKeys=JSON.parse($('#datalayer-auto-detected-keys').val()||'[]');}catch(e){autoDetectedKeys=[];}
+                $reserved_msg = esc_js( __( 'This key is reserved for auto-detected variables and cannot be used.', 'scripts-and-pixels-datalayer-manager' ) );
+                $l_name       = esc_js( __( 'Name', 'scripts-and-pixels-datalayer-manager' ) );
+                $l_value      = esc_js( __( 'Value', 'scripts-and-pixels-datalayer-manager' ) );
+                $l_type       = esc_js( __( 'Type', 'scripts-and-pixels-datalayer-manager' ) );
+                $l_actions    = esc_js( __( 'Actions', 'scripts-and-pixels-datalayer-manager' ) );
+                $l_string     = esc_js( __( 'String', 'scripts-and-pixels-datalayer-manager' ) );
+                $l_number     = esc_js( __( 'Number', 'scripts-and-pixels-datalayer-manager' ) );
+                $l_boolean    = esc_js( __( 'Boolean', 'scripts-and-pixels-datalayer-manager' ) );
+                $l_remove     = esc_js( __( 'Remove', 'scripts-and-pixels-datalayer-manager' ) );
+                $meta_box_js  = "(function(\$){\$(document).ready(function(){var autoDetectedKeys=[];try{autoDetectedKeys=JSON.parse(\$('#datalayer-auto-detected-keys').val()||'[]');}catch(e){autoDetectedKeys=[];}
 function validateVariableKey(key,inputElement){if(autoDetectedKeys.indexOf(key)!==-1){inputElement.css('border-color','#dc3232');var e=inputElement.siblings('.datalayer-error-message');if(e.length===0){inputElement.after('<span class=\"datalayer-error-message\" style=\"color:#dc3232;font-size:11px;display:block;margin-top:3px;\">" . $reserved_msg . "</span>');}return false;}else{inputElement.css('border-color','');inputElement.siblings('.datalayer-error-message').remove();return true;}}
-$('#add-datalayer-variable').on('click',function(){var i=Date.now(),tbody=$('#datalayer-custom-variables tbody');if(tbody.length===0){var tbl='<table class=\"wp-list-table widefat fixed striped\" style=\"margin-top:10px;\"><thead><tr><th style=\"width:30%;\">" . $l_name . "</th><th style=\"width:40%;\">" . $l_value . "</th><th style=\"width:20%;\">" . $l_type . "</th><th style=\"width:10%;\">" . $l_actions . "</th></tr></thead><tbody></tbody></table>';$('#datalayer-custom-variables').html(tbl);tbody=$('#datalayer-custom-variables tbody');}
+\$('#add-datalayer-variable').on('click',function(){var i=Date.now(),tbody=\$('#datalayer-custom-variables tbody');if(tbody.length===0){var tbl='<table class=\"wp-list-table widefat fixed striped\" style=\"margin-top:10px;\"><thead><tr><th style=\"width:30%;\">" . $l_name . "</th><th style=\"width:40%;\">" . $l_value . "</th><th style=\"width:20%;\">" . $l_type . "</th><th style=\"width:10%;\">" . $l_actions . "</th></tr></thead><tbody></tbody></table>';\$('#datalayer-custom-variables').html(tbl);tbody=\$('#datalayer-custom-variables tbody');}
 var row='<tr class=\"datalayer-variable-row\"><td><input type=\"text\" name=\"datalayer_variables['+i+'][key]\" value=\"\" class=\"regular-text datalayer-variable-key\" pattern=\"[A-Za-z0-9_]+\" required /></td><td><input type=\"text\" name=\"datalayer_variables['+i+'][value]\" value=\"\" class=\"regular-text\" required /></td><td><select name=\"datalayer_variables['+i+'][type]\" class=\"regular-text\"><option value=\"string\">" . $l_string . "</option><option value=\"number\">" . $l_number . "</option><option value=\"boolean\">" . $l_boolean . "</option></select></td><td><button type=\"button\" class=\"button button-small remove-variable-row\">" . $l_remove . "</button></td></tr>';tbody.append(row);});
-$(document).on('blur','.datalayer-variable-key',function(){var k=$(this).val().trim();if(k){validateVariableKey(k,$(this));}});
-$(document).on('click','.remove-variable-row',function(){$(this).closest('.datalayer-variable-row').remove();});});})(jQuery);";
+\$(document).on('blur','.datalayer-variable-key',function(){var k=\$(this).val().trim();if(k){validateVariableKey(k,\$(this));}});
+\$(document).on('click','.remove-variable-row',function(){\$(this).closest('.datalayer-variable-row').remove();});});})(jQuery);";
                 wp_add_inline_script( 'datalayer-manager-meta-box', $meta_box_js );
                 ?>
                 <?php endif; // End premium check. ?>

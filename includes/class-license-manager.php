@@ -47,7 +47,7 @@ class DataLayer_Manager_License {
      *
      * @var string
      */
-    private $product_id = 'datalayer-manager-premium';
+    private $product_id = 'scripts-and-pixels-datalayer-manager-premium';
 
     /**
      * Test mode flag.
@@ -247,7 +247,7 @@ class DataLayer_Manager_License {
         // Prepare API request for control layer.
         $api_params = array(
             'action'     => 'check',
-            'plugin'     => 'datalayer-manager',
+            'plugin'     => 'scripts-and-pixels-datalayer-manager',
             'license_key' => $license_key,
             'site_url'   => home_url(),
         );
@@ -328,7 +328,7 @@ class DataLayer_Manager_License {
         if ( empty( $license_key ) ) {
             return array(
                 'success' => false,
-                'message' => __( 'License key is required.', 'datalayer-manager' ),
+                'message' => __( 'License key is required.', 'scripts-and-pixels-datalayer-manager' ),
             );
         }
 
@@ -340,7 +340,7 @@ class DataLayer_Manager_License {
         // Prepare API request for control layer.
         $api_params = array(
             'action'     => 'activate',
-            'plugin'     => 'datalayer-manager',
+            'plugin'     => 'scripts-and-pixels-datalayer-manager',
             'license_key' => $license_key,
             'site_url'   => home_url(),
         );
@@ -362,7 +362,7 @@ class DataLayer_Manager_License {
         if ( is_wp_error( $response ) ) {
             return array(
                 'success' => false,
-                'message' => __( 'Error connecting to license server. Please try again later.', 'datalayer-manager' ),
+                'message' => __( 'Error connecting to license server. Please try again later.', 'scripts-and-pixels-datalayer-manager' ),
             );
         }
 
@@ -374,7 +374,7 @@ class DataLayer_Manager_License {
         if ( $response_code < 200 || $response_code >= 300 ) {
             // Still try to parse the response body in case it contains error details.
             $error_data = json_decode( $response_body, true );
-            $error_message = isset( $error_data['message'] ) ? $error_data['message'] : __( 'License server returned an error.', 'datalayer-manager' );
+            $error_message = isset( $error_data['message'] ) ? $error_data['message'] : __( 'License server returned an error.', 'scripts-and-pixels-datalayer-manager' );
             
             if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
                 error_log( 'DataLayer Manager License API Error - HTTP Code: ' . $response_code );
@@ -400,7 +400,7 @@ class DataLayer_Manager_License {
             
             return array(
                 'success' => false,
-                'message' => __( 'Invalid response from license server.', 'datalayer-manager' ),
+                'message' => __( 'Invalid response from license server.', 'scripts-and-pixels-datalayer-manager' ),
             );
         }
 
@@ -420,7 +420,7 @@ class DataLayer_Manager_License {
             $this->cache_status( $status );
 
             // Use message from server or default.
-            $message = isset( $license_data['message'] ) ? $license_data['message'] : __( 'License activated successfully!', 'datalayer-manager' );
+            $message = isset( $license_data['message'] ) ? $license_data['message'] : __( 'License activated successfully!', 'scripts-and-pixels-datalayer-manager' );
 
             return array(
                 'success' => true,
@@ -428,7 +428,7 @@ class DataLayer_Manager_License {
             );
         } else {
             // Get error message from server or use default.
-            $error_message = isset( $license_data['message'] ) ? $license_data['message'] : __( 'License activation failed.', 'datalayer-manager' );
+            $error_message = isset( $license_data['message'] ) ? $license_data['message'] : __( 'License activation failed.', 'scripts-and-pixels-datalayer-manager' );
 
             return array(
                 'success' => false,
@@ -460,14 +460,14 @@ class DataLayer_Manager_License {
 
             return array(
                 'success' => true,
-                'message' => __( 'Test license activated successfully! (Test Mode)', 'datalayer-manager' ),
+                'message' => __( 'Test license activated successfully! (Test Mode)', 'scripts-and-pixels-datalayer-manager' ),
             );
         }
 
         // Reject invalid test keys.
         return array(
             'success' => false,
-            'message' => __( 'Invalid test license key. Use: TEST-LICENSE-KEY-12345', 'datalayer-manager' ),
+            'message' => __( 'Invalid test license key. Use: TEST-LICENSE-KEY-12345', 'scripts-and-pixels-datalayer-manager' ),
         );
     }
 
@@ -482,14 +482,14 @@ class DataLayer_Manager_License {
         if ( empty( $license_key ) ) {
             return array(
                 'success' => false,
-                'message' => __( 'No license key found.', 'datalayer-manager' ),
+                'message' => __( 'No license key found.', 'scripts-and-pixels-datalayer-manager' ),
             );
         }
 
         // Prepare API request for control layer.
         $api_params = array(
             'action'     => 'deactivate',
-            'plugin'     => 'datalayer-manager',
+            'plugin'     => 'scripts-and-pixels-datalayer-manager',
             'license_key' => $license_key,
             'site_url'   => home_url(),
         );
@@ -515,7 +515,7 @@ class DataLayer_Manager_License {
 
             return array(
                 'success' => true,
-                'message' => __( 'License deactivated locally. (Could not reach license server.)', 'datalayer-manager' ),
+                'message' => __( 'License deactivated locally. (Could not reach license server.)', 'scripts-and-pixels-datalayer-manager' ),
             );
         }
 
@@ -525,7 +525,7 @@ class DataLayer_Manager_License {
 
         return array(
             'success' => true,
-            'message' => __( 'License deactivated successfully.', 'datalayer-manager' ),
+            'message' => __( 'License deactivated successfully.', 'scripts-and-pixels-datalayer-manager' ),
         );
     }
 
@@ -587,7 +587,7 @@ class DataLayer_Manager_License {
             set_transient( 'datalayer_manager_license_notice', $result, 30 );
 
             // Redirect to prevent resubmission.
-            wp_safe_redirect( add_query_arg( 'datalayer_license_action', 'activate', admin_url( 'options-general.php?page=datalayer-manager&screen=license' ) ) );
+            wp_safe_redirect( add_query_arg( 'datalayer_license_action', 'activate', admin_url( 'options-general.php?page=scripts-and-pixels-datalayer-manager&screen=license' ) ) );
             exit;
         }
 
@@ -599,7 +599,7 @@ class DataLayer_Manager_License {
             set_transient( 'datalayer_manager_license_notice', $result, 30 );
 
             // Redirect to prevent resubmission.
-            wp_safe_redirect( add_query_arg( 'datalayer_license_action', 'deactivate', admin_url( 'options-general.php?page=datalayer-manager&screen=license' ) ) );
+            wp_safe_redirect( add_query_arg( 'datalayer_license_action', 'deactivate', admin_url( 'options-general.php?page=scripts-and-pixels-datalayer-manager&screen=license' ) ) );
             exit;
         }
     }
@@ -609,7 +609,7 @@ class DataLayer_Manager_License {
      */
     public function show_license_notices() {
         // Only show on DataLayer Manager page with license screen.
-        if ( ! isset( $_GET['page'] ) || 'datalayer-manager' !== $_GET['page'] ) {
+        if ( ! isset( $_GET['page'] ) || 'scripts-and-pixels-datalayer-manager' !== $_GET['page'] ) {
             return;
         }
         

@@ -23,6 +23,13 @@ class DataLayer_Manager {
     private $license_manager;
 
     /**
+     * Last built dataLayer variables (for debug output in wp_head).
+     *
+     * @var array|null
+     */
+    private $last_datalayer_variables;
+
+    /**
      * Initialize the plugin.
      */
     public function init() {
@@ -46,8 +53,9 @@ class DataLayer_Manager {
         // Customize meta boxes panel label in block editor.
         add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_admin_scripts' ) );
         
-        // Frontend injection.
-        add_action( 'wp_head', array( $this, 'inject_datalayer' ), 1 );
+        // Frontend dataLayer: enqueue script (compliance) and optional debug output.
+        add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_datalayer_script' ), 1 );
+        add_action( 'wp_head', array( $this, 'output_datalayer_debug_comments' ), 0 );
     }
 
     /**
@@ -1242,55 +1250,18 @@ class DataLayer_Manager {
             return;
         }
 
-        // Add script to change meta boxes panel label in block editor.
-        add_action( 'admin_footer', array( $this, 'change_meta_boxes_label_script' ) );
-    }
+        // Enqueue script to change meta boxes panel label (wp_add_inline_script for compliance).
+        $label = esc_js( __( 'Scripts + Pixels DataLayer Manager', 'datalayer-manager' ) );
+        $label_script = "(function(){function changeMetaBoxesLabel(){var b=document.querySelector('.edit-post-meta-boxes-main__presenter button[aria-expanded]');if(b&&b.textContent.trim().includes('Meta Boxes')){b.innerHTML=b.innerHTML.replace(/Meta Boxes/g,'" . $label . "');}}changeMetaBoxesLabel();if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded',changeMetaBoxesLabel);}setTimeout(changeMetaBoxesLabel,500);setTimeout(changeMetaBoxesLabel,1000);setTimeout(changeMetaBoxesLabel,2000);if(typeof MutationObserver!=='undefined'){var o=new MutationObserver(function(){changeMetaBoxesLabel();});var t=document.querySelector('.edit-post-meta-boxes-main__presenter');if(t){o.observe(t,{childList:true,subtree:true,characterData:true});}}})();";
+        wp_register_script( 'datalayer-manager-meta-box-label', '', array(), DATALAYER_MANAGER_VERSION, true );
+        wp_enqueue_script( 'datalayer-manager-meta-box-label', '', array(), DATALAYER_MANAGER_VERSION, true );
+        wp_add_inline_script( 'datalayer-manager-meta-box-label', $label_script );
 
-    /**
-     * Output script to change meta boxes panel label.
-     */
-    public function change_meta_boxes_label_script() {
-        ?>
-        <script type="text/javascript">
-        (function() {
-            function changeMetaBoxesLabel() {
-                var button = document.querySelector('.edit-post-meta-boxes-main__presenter button[aria-expanded]');
-                if (button && button.textContent.trim().includes('Meta Boxes')) {
-                    button.innerHTML = button.innerHTML.replace(/Meta Boxes/g, '<?php echo esc_js( __( 'Scripts + Pixels DataLayer Manager', 'datalayer-manager' ) ); ?>');
-                }
-            }
-            
-            // Try immediately.
-            changeMetaBoxesLabel();
-            
-            // Try after DOM is ready.
-            if (document.readyState === 'loading') {
-                document.addEventListener('DOMContentLoaded', changeMetaBoxesLabel);
-            }
-            
-            // Try after delays (block editor loads async).
-            setTimeout(changeMetaBoxesLabel, 500);
-            setTimeout(changeMetaBoxesLabel, 1000);
-            setTimeout(changeMetaBoxesLabel, 2000);
-            
-            // Also watch for dynamic changes (block editor may update the DOM).
-            if (typeof MutationObserver !== 'undefined') {
-                var observer = new MutationObserver(function(mutations) {
-                    changeMetaBoxesLabel();
-                });
-                
-                var target = document.querySelector('.edit-post-meta-boxes-main__presenter');
-                if (target) {
-                    observer.observe(target, {
-                        childList: true,
-                        subtree: true,
-                        characterData: true
-                    });
-                }
-            }
-        })();
-        </script>
-        <?php
+        // Enqueue handle for Custom Variables script (inline script added in render_meta_box when Pro).
+        if ( ! DATALAYER_MANAGER_FREE_VERSION ) {
+            wp_register_script( 'datalayer-manager-meta-box', '', array( 'jquery' ), DATALAYER_MANAGER_VERSION, true );
+            wp_enqueue_script( 'datalayer-manager-meta-box', '', array( 'jquery' ), DATALAYER_MANAGER_VERSION, true );
+        }
     }
 
     /**
@@ -1485,85 +1456,27 @@ class DataLayer_Manager {
                 
                 <input type="hidden" id="datalayer-auto-detected-keys" value="<?php echo esc_attr( wp_json_encode( $auto_detected_keys ) ); ?>" />
             
+                <?php
+                // Inline script via wp_add_inline_script for compliance.
+                $reserved_msg = esc_js( __( 'This key is reserved for auto-detected variables and cannot be used.', 'datalayer-manager' ) );
+                $l_name       = esc_js( __( 'Name', 'datalayer-manager' ) );
+                $l_value      = esc_js( __( 'Value', 'datalayer-manager' ) );
+                $l_type       = esc_js( __( 'Type', 'datalayer-manager' ) );
+                $l_actions    = esc_js( __( 'Actions', 'datalayer-manager' ) );
+                $l_string     = esc_js( __( 'String', 'datalayer-manager' ) );
+                $l_number     = esc_js( __( 'Number', 'datalayer-manager' ) );
+                $l_boolean    = esc_js( __( 'Boolean', 'datalayer-manager' ) );
+                $l_remove     = esc_js( __( 'Remove', 'datalayer-manager' ) );
+                $meta_box_js  = "(function($){$(document).ready(function(){var autoDetectedKeys=[];try{autoDetectedKeys=JSON.parse($('#datalayer-auto-detected-keys').val()||'[]');}catch(e){autoDetectedKeys=[];}
+function validateVariableKey(key,inputElement){if(autoDetectedKeys.indexOf(key)!==-1){inputElement.css('border-color','#dc3232');var e=inputElement.siblings('.datalayer-error-message');if(e.length===0){inputElement.after('<span class=\"datalayer-error-message\" style=\"color:#dc3232;font-size:11px;display:block;margin-top:3px;\">" . $reserved_msg . "</span>');}return false;}else{inputElement.css('border-color','');inputElement.siblings('.datalayer-error-message').remove();return true;}}
+$('#add-datalayer-variable').on('click',function(){var i=Date.now(),tbody=$('#datalayer-custom-variables tbody');if(tbody.length===0){var tbl='<table class=\"wp-list-table widefat fixed striped\" style=\"margin-top:10px;\"><thead><tr><th style=\"width:30%;\">" . $l_name . "</th><th style=\"width:40%;\">" . $l_value . "</th><th style=\"width:20%;\">" . $l_type . "</th><th style=\"width:10%;\">" . $l_actions . "</th></tr></thead><tbody></tbody></table>';$('#datalayer-custom-variables').html(tbl);tbody=$('#datalayer-custom-variables tbody');}
+var row='<tr class=\"datalayer-variable-row\"><td><input type=\"text\" name=\"datalayer_variables['+i+'][key]\" value=\"\" class=\"regular-text datalayer-variable-key\" pattern=\"[A-Za-z0-9_]+\" required /></td><td><input type=\"text\" name=\"datalayer_variables['+i+'][value]\" value=\"\" class=\"regular-text\" required /></td><td><select name=\"datalayer_variables['+i+'][type]\" class=\"regular-text\"><option value=\"string\">" . $l_string . "</option><option value=\"number\">" . $l_number . "</option><option value=\"boolean\">" . $l_boolean . "</option></select></td><td><button type=\"button\" class=\"button button-small remove-variable-row\">" . $l_remove . "</button></td></tr>';tbody.append(row);});
+$(document).on('blur','.datalayer-variable-key',function(){var k=$(this).val().trim();if(k){validateVariableKey(k,$(this));}});
+$(document).on('click','.remove-variable-row',function(){$(this).closest('.datalayer-variable-row').remove();});});})(jQuery);";
+                wp_add_inline_script( 'datalayer-manager-meta-box', $meta_box_js );
+                ?>
                 <?php endif; // End premium check. ?>
             </div>
-        
-        <script type="text/javascript">
-        (function($) {
-            $(document).ready(function() {
-                var autoDetectedKeys = [];
-                try {
-                    autoDetectedKeys = JSON.parse($('#datalayer-auto-detected-keys').val() || '[]');
-                } catch(e) {
-                    autoDetectedKeys = [];
-                }
-                
-                // Validate key against auto-detected keys.
-                function validateVariableKey(key, inputElement) {
-                    if (autoDetectedKeys.indexOf(key) !== -1) {
-                        inputElement.css('border-color', '#dc3232');
-                        var errorMsg = inputElement.siblings('.datalayer-error-message');
-                        if (errorMsg.length === 0) {
-                            inputElement.after('<span class="datalayer-error-message" style="color: #dc3232; font-size: 11px; display: block; margin-top: 3px;"><?php echo esc_js( __( 'This key is reserved for auto-detected variables and cannot be used.', 'datalayer-manager' ) ); ?></span>');
-                        }
-                        return false;
-                    } else {
-                        inputElement.css('border-color', '');
-                        inputElement.siblings('.datalayer-error-message').remove();
-                        return true;
-                    }
-                }
-                
-                // Add variable row.
-                $('#add-datalayer-variable').on('click', function() {
-                    var index = Date.now();
-                    var tbody = $('#datalayer-custom-variables tbody');
-                    
-                    // Create table structure if it doesn't exist.
-                    if (tbody.length === 0) {
-                        var table = '<table class="wp-list-table widefat fixed striped" style="margin-top: 10px;">' +
-                            '<thead>' +
-                            '<tr>' +
-                            '<th style="width: 30%;"><?php echo esc_js( __( 'Name', 'datalayer-manager' ) ); ?></th>' +
-                            '<th style="width: 40%;"><?php echo esc_js( __( 'Value', 'datalayer-manager' ) ); ?></th>' +
-                            '<th style="width: 20%;"><?php echo esc_js( __( 'Type', 'datalayer-manager' ) ); ?></th>' +
-                            '<th style="width: 10%;"><?php echo esc_js( __( 'Actions', 'datalayer-manager' ) ); ?></th>' +
-                            '</tr>' +
-                            '</thead>' +
-                            '<tbody></tbody>' +
-                            '</table>';
-                        $('#datalayer-custom-variables').html(table);
-                        tbody = $('#datalayer-custom-variables tbody');
-                    }
-                    
-                    var row = '<tr class="datalayer-variable-row">' +
-                        '<td><input type="text" name="datalayer_variables[' + index + '][key]" value="" class="regular-text datalayer-variable-key" pattern="[A-Za-z0-9_]+" required /></td>' +
-                        '<td><input type="text" name="datalayer_variables[' + index + '][value]" value="" class="regular-text" required /></td>' +
-                        '<td><select name="datalayer_variables[' + index + '][type]" class="regular-text">' +
-                        '<option value="string"><?php echo esc_js( __( 'String', 'datalayer-manager' ) ); ?></option>' +
-                        '<option value="number"><?php echo esc_js( __( 'Number', 'datalayer-manager' ) ); ?></option>' +
-                        '<option value="boolean"><?php echo esc_js( __( 'Boolean', 'datalayer-manager' ) ); ?></option>' +
-                        '</select></td>' +
-                        '<td><button type="button" class="button button-small remove-variable-row"><?php echo esc_js( __( 'Remove', 'datalayer-manager' ) ); ?></button></td>' +
-                        '</tr>';
-                    tbody.append(row);
-                });
-                
-                // Validate on key input.
-                $(document).on('blur', '.datalayer-variable-key', function() {
-                    var key = $(this).val().trim();
-                    if (key) {
-                        validateVariableKey(key, $(this));
-                    }
-                });
-                
-                // Remove variable row.
-                $(document).on('click', '.remove-variable-row', function() {
-                    $(this).closest('.datalayer-variable-row').remove();
-                });
-            });
-        })(jQuery);
-        </script>
             <?php endif; // End WP.org check: hide Custom Variables section when DATALAYER_MANAGER_FREE_VERSION. ?>
         </div>
         <?php
@@ -1867,73 +1780,55 @@ class DataLayer_Manager {
     }
 
     /**
-     * Inject dataLayer script into frontend head.
-     * Auto-detects WordPress context and builds dataLayer automatically.
+     * Enqueue frontend dataLayer script (wp_enqueue_script + wp_add_inline_script for compliance).
      */
-    public function inject_datalayer() {
-        // Only inject on frontend, not in admin.
+    public function enqueue_datalayer_script() {
         if ( is_admin() ) {
             return;
         }
 
-        // Auto-detect WordPress context and build variables.
         $variables = $this->get_automatic_datalayer_variables();
 
-        // Get custom variables for current post/page (if on singular page).
         if ( is_singular() ) {
             $post_id = get_queried_object_id();
             $custom_variables = $this->get_custom_variables( $post_id );
-            
-            // Merge custom variables with auto-detected ones (custom overrides auto).
             if ( ! empty( $custom_variables ) ) {
                 $variables = array_merge( $variables, $custom_variables );
-                
-                if ( $this->is_debug_mode() ) {
-                    echo "<!-- Scripts + Pixels DataLayer Manager: Merged " . esc_html( count( $custom_variables ) ) . " custom variables -->\n";
-                }
             }
         }
 
         if ( empty( $variables ) ) {
-            // No variables - fail safely, do nothing.
-            if ( $this->is_debug_mode() ) {
-                echo "<!-- Scripts + Pixels DataLayer Manager: No variables detected -->\n";
-            }
             return;
         }
 
-        // Debug mode output (admin-only).
-        if ( $this->is_debug_mode() ) {
-            echo "<!-- Scripts + Pixels DataLayer Manager: Auto-detected " . esc_html( count( $variables ) ) . " variables -->\n";
-        }
-
-        // Allow filtering of variables before injection (for extensibility).
         $variables = apply_filters( 'datalayer_manager_variables', $variables );
 
-        // Generate JavaScript.
-        $js_variables = wp_json_encode( $variables, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE );
-        
-        // Output script tag with .push() method (best practice).
-        ?>
-        <script type="text/javascript">
-        try {
-            // Ensure dataLayer exists.
-            window.dataLayer = window.dataLayer || [];
-            
-            // Push variables to dataLayer using .push() method (best practice).
-            <?php
-            // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- wp_json_encode() output is safe for JSON in JavaScript context.
-            echo 'window.dataLayer.push(' . $js_variables . ');';
-            ?>
-        } catch ( error ) {
-            // Fail safely - avoid fatal JS errors.
-            console.error( 'Scripts + Pixels DataLayer Manager: Error injecting variables', error );
-        }
-        </script>
-        <?php
+        // Store for debug output in wp_head (optional).
+        $this->last_datalayer_variables = $variables;
 
-        // Allow other plugins to hook after injection.
+        $js_variables = wp_json_encode( $variables, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE );
+        $inline = 'try{window.dataLayer=window.dataLayer||[];window.dataLayer.push(' . $js_variables . ');}catch(e){console.error("Scripts + Pixels DataLayer Manager: Error injecting variables",e);}';
+
+        wp_register_script( 'datalayer-manager-front', '', array(), DATALAYER_MANAGER_VERSION, false );
+        wp_enqueue_script( 'datalayer-manager-front', '', array(), DATALAYER_MANAGER_VERSION, false );
+        wp_add_inline_script( 'datalayer-manager-front', $inline );
+
         do_action( 'datalayer_manager_after_injection', $variables );
+    }
+
+    /**
+     * Output debug HTML comments in frontend head (when debug mode enabled).
+     */
+    public function output_datalayer_debug_comments() {
+        if ( is_admin() || ! $this->is_debug_mode() ) {
+            return;
+        }
+        if ( ! isset( $this->last_datalayer_variables ) ) {
+            return;
+        }
+        $variables = $this->last_datalayer_variables;
+        $count     = count( $variables );
+        echo "<!-- Scripts + Pixels DataLayer Manager: Auto-detected " . esc_html( (string) $count ) . " variables -->\n";
     }
 
     /**

@@ -1,7 +1,7 @@
 <?php
 /**
- * Plugin Name: DataLayer Manager
- * Description: Automatically detects WordPress context and injects dataLayer variables for analytics tools (GA4/GTM). Premium: Custom variables per page/post. No coding required.
+ * Plugin Name: Scripts + Pixels DataLayer Manager
+ * Description: Automatically detects WordPress context and injects dataLayer variables for analytics tools (GA4/GTM). Custom variables per page/post. No coding required.
  * Version: 1.0.0
  * Author: Scripts + Pixels
  * Author URI: https://scriptsandpixels.studio
@@ -64,7 +64,7 @@ function datalayer_manager_wp_version_notice() {
             <?php
             printf(
                 /* translators: %s: Minimum required WordPress version. */
-                esc_html__( 'DataLayer Manager requires WordPress %s or higher. Please update WordPress.', 'datalayer-manager' ),
+                esc_html__( 'Scripts + Pixels DataLayer Manager requires WordPress %s or higher. Please update WordPress.', 'datalayer-manager' ),
                 esc_html( DATALAYER_MANAGER_MIN_WP_VERSION )
             );
             ?>
@@ -83,7 +83,7 @@ function datalayer_manager_php_version_notice() {
             <?php
             printf(
                 /* translators: %1$s: Minimum required PHP version, %2$s: Current PHP version. */
-                esc_html__( 'DataLayer Manager requires PHP %1$s or higher. You are running PHP %2$s. Please contact your hosting provider to update PHP.', 'datalayer-manager' ),
+                esc_html__( 'Scripts + Pixels DataLayer Manager requires PHP %1$s or higher. You are running PHP %2$s. Please contact your hosting provider to update PHP.', 'datalayer-manager' ),
                 esc_html( DATALAYER_MANAGER_MIN_PHP_VERSION ),
                 esc_html( PHP_VERSION )
             );
@@ -126,7 +126,7 @@ function datalayer_manager_activate() {
     if ( ! datalayer_manager_check_requirements() ) {
         deactivate_plugins( plugin_basename( DATALAYER_MANAGER_PLUGIN_FILE ) );
         wp_die(
-            esc_html__( 'DataLayer Manager could not be activated. Please check the requirements.', 'datalayer-manager' ),
+            esc_html__( 'Scripts + Pixels DataLayer Manager could not be activated. Please check the requirements.', 'datalayer-manager' ),
             esc_html__( 'Plugin Activation Error', 'datalayer-manager' ),
             array( 'back_link' => true )
         );

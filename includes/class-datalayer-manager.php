@@ -94,8 +94,8 @@ class DataLayer_Manager {
      */
     public function register_admin_menu() {
         add_options_page(
-            __( 'DataLayer Manager', 'datalayer-manager' ),
-            __( 'DataLayer Manager', 'datalayer-manager' ),
+            __( 'Scripts + Pixels DataLayer Manager', 'datalayer-manager' ),
+            __( 'Scripts + Pixels DataLayer Manager', 'datalayer-manager' ),
             DataLayer_Manager_Capabilities::CAP_VIEW,
             'datalayer-manager',
             array( $this, 'render_admin_page' )
@@ -357,9 +357,9 @@ class DataLayer_Manager {
                 
                 <!-- Introduction Section -->
                 <div style="background: #fff; border: 1px solid #ccd0d4; box-shadow: 0 1px 1px rgba(0,0,0,.04); padding: 20px; margin: 20px 0;">
-                    <h2 style="margin-top: 0;"><?php esc_html_e( 'What is DataLayer Manager?', 'datalayer-manager' ); ?></h2>
+                    <h2 style="margin-top: 0;"><?php esc_html_e( 'What is Scripts + Pixels DataLayer Manager?', 'datalayer-manager' ); ?></h2>
                     <p style="font-size: 15px; line-height: 1.6;">
-                        <?php esc_html_e( 'DataLayer Manager automatically creates and manages a dataLayer object for your WordPress site. This object contains structured data about your pages, posts, products, and user interactions that can be used by analytics tools like Google Tag Manager (GTM) and Google Analytics 4 (GA4).', 'datalayer-manager' ); ?>
+                        <?php esc_html_e( 'Scripts + Pixels DataLayer Manager automatically creates and manages a dataLayer object for your WordPress site. This object contains structured data about your pages, posts, products, and user interactions that can be used by analytics tools like Google Tag Manager (GTM) and Google Analytics 4 (GA4).', 'datalayer-manager' ); ?>
                     </p>
                     <p style="font-size: 15px; line-height: 1.6;">
                         <strong><?php esc_html_e( 'No coding required!', 'datalayer-manager' ); ?></strong>
@@ -541,7 +541,7 @@ class DataLayer_Manager {
                 <div style="background: #fff; border: 1px solid #ccd0d4; box-shadow: 0 1px 1px rgba(0,0,0,.04); padding: 20px; margin: 20px 0;">
                     <h2 style="margin-top: 0;"><?php esc_html_e( 'How It Works', 'datalayer-manager' ); ?></h2>
                     <p style="font-size: 14px; line-height: 1.8;">
-                        <?php esc_html_e( 'DataLayer Manager uses WordPress hooks to automatically detect page context (page type, post information, categories, user status, etc.) and WooCommerce data (products, cart, checkout) when available. All detected variables are then injected into', 'datalayer-manager' ); ?>
+                        <?php esc_html_e( 'Scripts + Pixels DataLayer Manager uses WordPress hooks to automatically detect page context (page type, post information, categories, user status, etc.) and WooCommerce data (products, cart, checkout) when available. All detected variables are then injected into', 'datalayer-manager' ); ?>
                         <code>window.dataLayer</code>
                         <?php esc_html_e( 'on every frontend page using the', 'datalayer-manager' ); ?>
                         <code>.push()</code>
@@ -559,7 +559,7 @@ class DataLayer_Manager {
                 <?php
                 printf(
                     /* translators: %1$s: Plugin version, %2$s: Link to author website, %3$s: Author name. */
-                    esc_html__( 'DataLayer Manager version %1$s by %2$s', 'datalayer-manager' ),
+                    esc_html__( 'Scripts + Pixels DataLayer Manager version %1$s by %2$s', 'datalayer-manager' ),
                     esc_html( DATALAYER_MANAGER_VERSION ),
                     '<a href="' . esc_url( 'https://scriptsandpixels.studio' ) . '" target="_blank" rel="noopener noreferrer">' . esc_html__( 'Scripts + Pixels', 'datalayer-manager' ) . '</a>'
                 );
@@ -1256,7 +1256,7 @@ class DataLayer_Manager {
             function changeMetaBoxesLabel() {
                 var button = document.querySelector('.edit-post-meta-boxes-main__presenter button[aria-expanded]');
                 if (button && button.textContent.trim().includes('Meta Boxes')) {
-                    button.innerHTML = button.innerHTML.replace(/Meta Boxes/g, '<?php echo esc_js( __( 'DataLayer Manager', 'datalayer-manager' ) ); ?>');
+                    button.innerHTML = button.innerHTML.replace(/Meta Boxes/g, '<?php echo esc_js( __( 'Scripts + Pixels DataLayer Manager', 'datalayer-manager' ) ); ?>');
                 }
             }
             
@@ -1887,7 +1887,7 @@ class DataLayer_Manager {
                 $variables = array_merge( $variables, $custom_variables );
                 
                 if ( $this->is_debug_mode() ) {
-                    echo "<!-- DataLayer Manager: Merged " . esc_html( count( $custom_variables ) ) . " custom variables -->\n";
+                    echo "<!-- Scripts + Pixels DataLayer Manager: Merged " . esc_html( count( $custom_variables ) ) . " custom variables -->\n";
                 }
             }
         }
@@ -1895,14 +1895,14 @@ class DataLayer_Manager {
         if ( empty( $variables ) ) {
             // No variables - fail safely, do nothing.
             if ( $this->is_debug_mode() ) {
-                echo "<!-- DataLayer Manager: No variables detected -->\n";
+                echo "<!-- Scripts + Pixels DataLayer Manager: No variables detected -->\n";
             }
             return;
         }
 
         // Debug mode output (admin-only).
         if ( $this->is_debug_mode() ) {
-            echo "<!-- DataLayer Manager: Auto-detected " . esc_html( count( $variables ) ) . " variables -->\n";
+            echo "<!-- Scripts + Pixels DataLayer Manager: Auto-detected " . esc_html( count( $variables ) ) . " variables -->\n";
         }
 
         // Allow filtering of variables before injection (for extensibility).
@@ -1925,7 +1925,7 @@ class DataLayer_Manager {
             ?>
         } catch ( error ) {
             // Fail safely - avoid fatal JS errors.
-            console.error( 'DataLayer Manager: Error injecting variables', error );
+            console.error( 'Scripts + Pixels DataLayer Manager: Error injecting variables', error );
         }
         </script>
         <?php

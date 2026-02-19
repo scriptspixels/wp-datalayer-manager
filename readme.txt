@@ -1,4 +1,4 @@
-=== DataLayer Manager ===
+=== Scripts + Pixels DataLayer Manager ===
 Contributors: scriptsandpixels
 Tags: datalayer, google-tag-manager, analytics, tracking, woocommerce
 Requires at least: 5.0
@@ -12,7 +12,7 @@ Automatically detects WordPress context and injects dataLayer variables for anal
 
 == Description ==
 
-DataLayer Manager automatically creates and manages a dataLayer object for your WordPress site. This object contains structured data about your pages, posts, products, and user interactions that can be used by analytics tools like Google Tag Manager (GTM) and Google Analytics 4 (GA4).
+Scripts + Pixels DataLayer Manager automatically creates and manages a dataLayer object for your WordPress site. This object contains structured data about your pages, posts, products, and user interactions that can be used by analytics tools like Google Tag Manager (GTM) and Google Analytics 4 (GA4).
 
 **No coding required!** The plugin automatically detects WordPress and WooCommerce data and injects it into the dataLayer on every page.
 

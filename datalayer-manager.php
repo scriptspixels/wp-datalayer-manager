@@ -169,24 +169,6 @@ function datalayer_manager_init() {
 }
 add_action( 'plugins_loaded', 'datalayer_manager_init', 10 );
 
-/**
- * Add plugin action links.
- *
- * @param array $links Existing action links.
- * @return array Modified action links.
- */
-function datalayer_manager_plugin_action_links( $links ) {
-    // Add settings link.
-    $settings_link = sprintf(
-        '<a href="%s">%s</a>',
-        esc_url( admin_url( 'options-general.php?page=scripts-and-pixels-datalayer-manager' ) ),
-        esc_html__( 'Settings', 'scripts-and-pixels-datalayer-manager' )
-    );
-    array_unshift( $links, $settings_link );
-
-    return $links;
-}
-add_filter( 'plugin_action_links_' . plugin_basename( DATALAYER_MANAGER_PLUGIN_FILE ), 'datalayer_manager_plugin_action_links' );
 
 /**
  * Add plugin row meta links.
@@ -199,6 +181,16 @@ function datalayer_manager_plugin_row_meta( $links, $file ) {
     // Only add links for this plugin.
     if ( plugin_basename( DATALAYER_MANAGER_PLUGIN_FILE ) !== $file ) {
         return $links;
+    }
+
+    // WP.org (free) version only: add Overview link at the end of the description row.
+    if ( DATALAYER_MANAGER_FREE_VERSION ) {
+        $overview_link = sprintf(
+            '<a href="%s">%s</a>',
+            esc_url( admin_url( 'options-general.php?page=scripts-and-pixels-datalayer-manager' ) ),
+            esc_html__( 'Overview', 'scripts-and-pixels-datalayer-manager' )
+        );
+        $links[] = $overview_link;
     }
 
     // Only show "Activate License" link if not free version and license is not active.

@@ -1397,6 +1397,7 @@ class DataLayer_Manager {
                 </div>
             <?php endif; ?>
             
+            <?php if ( ! DATALAYER_MANAGER_FREE_VERSION ) : ?>
             <div style="margin-top: 20px; padding-top: 15px; border-top: 1px solid #ddd;">
                 <p>
                     <strong><?php esc_html_e( 'Custom Variables', 'datalayer-manager' ); ?></strong>
@@ -1486,7 +1487,6 @@ class DataLayer_Manager {
             
                 <?php endif; // End premium check. ?>
             </div>
-        </div>
         
         <script type="text/javascript">
         (function($) {
@@ -1564,6 +1564,8 @@ class DataLayer_Manager {
             });
         })(jQuery);
         </script>
+            <?php endif; // End WP.org check: hide Custom Variables section when DATALAYER_MANAGER_FREE_VERSION. ?>
+        </div>
         <?php
     }
 

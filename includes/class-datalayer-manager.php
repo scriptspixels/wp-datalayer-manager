@@ -332,23 +332,12 @@ class DataLayer_Manager {
                         <?php esc_html_e( 'DataLayer variables are being automatically detected and injected on all frontend pages.', 'scripts-and-pixels-datalayer-manager' ); ?>
                     </p>
                     
-                    <!-- Premium License Status -->
-                    <?php if ( $this->is_premium_active() ) : ?>
-                        <p style="font-size: 14px; padding: 10px; background: #d4edda; border-left: 4px solid #28a745; margin: 10px 0;">
-                            <strong style="color: #155724;">✓ <?php esc_html_e( 'Premium License Active', 'scripts-and-pixels-datalayer-manager' ); ?></strong><br>
-                            <?php esc_html_e( 'You have access to all premium features, including custom variables on a per-page basis.', 'scripts-and-pixels-datalayer-manager' ); ?>
-                        </p>
-                    <?php else : ?>
-                        <?php if ( DATALAYER_MANAGER_FREE_VERSION ) : ?>
-                            <p style="font-size: 14px; padding: 10px; background: #e7f3ff; border-left: 4px solid #2271b1; margin: 10px 0;">
-                                <strong style="color: #135e96;">ℹ <?php esc_html_e( 'Free Version', 'scripts-and-pixels-datalayer-manager' ); ?></strong><br>
-                                <?php
-                                printf(
-                                    /* translators: %s: Link to plugin website. */
-                                    esc_html__( 'You are using the free version with automatic dataLayer detection. Premium features like custom variables per page are available in the premium version. %s', 'scripts-and-pixels-datalayer-manager' ),
-                                    '<a href="' . esc_url( 'https://scriptsandpixels.studio' ) . '" target="_blank" rel="noopener noreferrer">' . esc_html__( 'Learn more', 'scripts-and-pixels-datalayer-manager' ) . '</a>'
-                                );
-                                ?>
+                    <!-- Premium License Status (only when Pro/custom-variables code is present) -->
+                    <?php if ( class_exists( 'DataLayer_Manager_Custom_Variables' ) ) : ?>
+                        <?php if ( $this->is_premium_active() ) : ?>
+                            <p style="font-size: 14px; padding: 10px; background: #d4edda; border-left: 4px solid #28a745; margin: 10px 0;">
+                                <strong style="color: #155724;">✓ <?php esc_html_e( 'Premium License Active', 'scripts-and-pixels-datalayer-manager' ); ?></strong><br>
+                                <?php esc_html_e( 'You have access to all premium features, including custom variables on a per-page basis.', 'scripts-and-pixels-datalayer-manager' ); ?>
                             </p>
                         <?php else : ?>
                             <p style="font-size: 14px; padding: 10px; background: #fff3cd; border-left: 4px solid #ffc107; margin: 10px 0;">
@@ -372,17 +361,15 @@ class DataLayer_Manager {
                     <p style="font-size: 15px; line-height: 1.6;">
                         <strong><?php esc_html_e( 'No coding required!', 'scripts-and-pixels-datalayer-manager' ); ?></strong>
                         <?php esc_html_e( 'The plugin automatically detects WordPress and WooCommerce data and injects it into the dataLayer on every page.', 'scripts-and-pixels-datalayer-manager' ); ?>
-                        <?php if ( ! $this->is_premium_active() ) : ?>
-                            <?php if ( DATALAYER_MANAGER_FREE_VERSION ) : ?>
-                                <?php esc_html_e( 'Custom variables per page are available in the premium version.', 'scripts-and-pixels-datalayer-manager' ); ?>
+                        <?php if ( class_exists( 'DataLayer_Manager_Custom_Variables' ) ) : ?>
+                            <?php if ( $this->is_premium_active() ) : ?>
+                                <?php esc_html_e( 'You can also add custom variables on a per-page basis using the editor.', 'scripts-and-pixels-datalayer-manager' ); ?>
                             <?php else : ?>
                                 <?php esc_html_e( 'Upgrade to Premium to add custom variables on a per-page basis.', 'scripts-and-pixels-datalayer-manager' ); ?>
                                 <a href="<?php echo esc_url( admin_url( 'options-general.php?page=scripts-and-pixels-datalayer-manager&screen=license' ) ); ?>" style="margin-left: 5px;">
                                     <?php esc_html_e( 'Learn More', 'scripts-and-pixels-datalayer-manager' ); ?>
                                 </a>
                             <?php endif; ?>
-                        <?php else : ?>
-                            <?php esc_html_e( 'You can also add custom variables on a per-page basis using the editor.', 'scripts-and-pixels-datalayer-manager' ); ?>
                         <?php endif; ?>
                     </p>
                 </div>
@@ -423,6 +410,7 @@ class DataLayer_Manager {
                         <?php esc_html_e( 'You can also use', 'scripts-and-pixels-datalayer-manager' ); ?> <code>window.dataLayer[0]</code> <?php esc_html_e( 'to see just the first (most recent) dataLayer push.', 'scripts-and-pixels-datalayer-manager' ); ?>
                     </p>
 
+                    <?php if ( class_exists( 'DataLayer_Manager_Custom_Variables' ) ) : ?>
                     <h3><?php esc_html_e( '2. Add Custom Variables (Premium Feature)', 'scripts-and-pixels-datalayer-manager' ); ?></h3>
                     <?php if ( ! $this->is_premium_active() ) : ?>
                         <div style="background: #fff3cd; border-left: 4px solid #ffc107; padding: 12px; margin: 15px 0;">
@@ -475,6 +463,7 @@ class DataLayer_Manager {
                         <strong><?php esc_html_e( 'Note:', 'scripts-and-pixels-datalayer-manager' ); ?></strong>
                         <?php esc_html_e( 'Custom variable names cannot match auto-detected variable names. The plugin will prevent you from using reserved names.', 'scripts-and-pixels-datalayer-manager' ); ?>
                     </p>
+                    <?php endif; ?>
                 </div>
 
                 <!-- Available Variables Section -->
@@ -556,7 +545,10 @@ class DataLayer_Manager {
                         <?php esc_html_e( 'method, which is the recommended approach for Google Tag Manager and Google Analytics 4.', 'scripts-and-pixels-datalayer-manager' ); ?>
                     </p>
                     <p style="font-size: 14px; line-height: 1.8;">
-                        <?php esc_html_e( 'The dataLayer object is created automatically if it doesn\'t exist, so it works seamlessly with existing Google Tag Manager installations. Custom variables added via the editor are merged with auto-detected variables, with custom variables taking precedence if there are any conflicts.', 'scripts-and-pixels-datalayer-manager' ); ?>
+                        <?php esc_html_e( 'The dataLayer object is created automatically if it doesn\'t exist, so it works seamlessly with existing Google Tag Manager installations.', 'scripts-and-pixels-datalayer-manager' ); ?>
+                        <?php if ( class_exists( 'DataLayer_Manager_Custom_Variables' ) ) : ?>
+                            <?php esc_html_e( 'Custom variables added via the editor are merged with auto-detected variables, with custom variables taking precedence if there are any conflicts.', 'scripts-and-pixels-datalayer-manager' ); ?>
+                        <?php endif; ?>
                     </p>
                 </div>
 
@@ -1257,8 +1249,8 @@ class DataLayer_Manager {
         wp_enqueue_script( 'datalayer-manager-meta-box-label', '', array(), DATALAYER_MANAGER_VERSION, true );
         wp_add_inline_script( 'datalayer-manager-meta-box-label', $label_script );
 
-        // Enqueue handle for Custom Variables script (inline script added in render_meta_box when Pro).
-        if ( ! DATALAYER_MANAGER_FREE_VERSION ) {
+        // Enqueue handle for Custom Variables script only when that feature is present (Pro build).
+        if ( class_exists( 'DataLayer_Manager_Custom_Variables' ) ) {
             wp_register_script( 'datalayer-manager-meta-box', '', array( 'jquery' ), DATALAYER_MANAGER_VERSION, true );
             wp_enqueue_script( 'datalayer-manager-meta-box', '', array( 'jquery' ), DATALAYER_MANAGER_VERSION, true );
         }
@@ -1317,25 +1309,8 @@ class DataLayer_Manager {
         // Add nonce for security.
         wp_nonce_field( 'datalayer_manager_meta_box', 'datalayer_manager_meta_box_nonce' );
         
-        // Get custom variables from post meta.
-        $custom_variables = get_post_meta( $post->ID, '_datalayer_manager_custom_variables', true );
-        if ( ! is_array( $custom_variables ) ) {
-            $custom_variables = array();
-        }
-        
-        // Get auto-detected variable keys that are reserved/uneditable.
-        $auto_detected_keys = $this->get_auto_detected_variable_keys( $post );
-        
         // Get preview of auto-detected variables with their values.
         $auto_detected_variables = $this->get_auto_detected_variables_preview( $post );
-        
-        // Filter out custom variables that match auto-detected keys (they shouldn't exist, but clean up if they do).
-        $filtered_custom_variables = array();
-        foreach ( $custom_variables as $key => $value ) {
-            if ( ! in_array( $key, $auto_detected_keys, true ) ) {
-                $filtered_custom_variables[ $key ] = $value;
-            }
-        }
         
         ?>
         <div class="datalayer-manager-meta-box">
@@ -1368,116 +1343,9 @@ class DataLayer_Manager {
                 </div>
             <?php endif; ?>
             
-            <?php if ( ! DATALAYER_MANAGER_FREE_VERSION ) : ?>
-            <div style="margin-top: 20px; padding-top: 15px; border-top: 1px solid #ddd;">
-                <p>
-                    <strong><?php esc_html_e( 'Custom Variables', 'scripts-and-pixels-datalayer-manager' ); ?></strong>
-                </p>
-                <p class="description">
-                    <?php esc_html_e( 'Add custom dataLayer variables that will merge with auto-detected variables for this page.', 'scripts-and-pixels-datalayer-manager' ); ?>
-                </p>
-                
-                <?php if ( ! $this->is_premium_active() ) : ?>
-                    <div style="background: <?php echo DATALAYER_MANAGER_FREE_VERSION ? '#e7f3ff' : '#fff3cd'; ?>; border-left: 4px solid <?php echo DATALAYER_MANAGER_FREE_VERSION ? '#2271b1' : '#ffc107'; ?>; padding: 12px; margin: 15px 0;">
-                        <p style="margin: 0 0 10px 0;">
-                            <strong><?php esc_html_e( 'Premium Feature', 'scripts-and-pixels-datalayer-manager' ); ?></strong>
-                        </p>
-                        <p style="margin: 0 0 10px 0;">
-                            <?php
-                            printf(
-                                /* translators: %s: Link to plugin website. */
-                                esc_html__( 'Custom variables allow you to add page-specific dataLayer variables for tracking campaign codes, affiliate IDs, and other custom data. This feature is available in the premium version. %s', 'scripts-and-pixels-datalayer-manager' ),
-                                '<a href="' . esc_url( 'https://scriptsandpixels.studio' ) . '" target="_blank" rel="noopener noreferrer">' . esc_html__( 'Learn more', 'scripts-and-pixels-datalayer-manager' ) . '</a>'
-                            );
-                            ?>
-                        </p>
-                        <?php if ( ! DATALAYER_MANAGER_FREE_VERSION ) : ?>
-                            <p style="margin: 0;">
-                                <a href="<?php echo esc_url( admin_url( 'options-general.php?page=scripts-and-pixels-datalayer-manager&screen=license' ) ); ?>" class="button button-primary">
-                                    <?php esc_html_e( 'Activate License', 'scripts-and-pixels-datalayer-manager' ); ?>
-                                </a>
-                            </p>
-                        <?php endif; ?>
-                    </div>
-                <?php else : ?>
-            
-            <div id="datalayer-custom-variables">
-                <?php if ( ! empty( $filtered_custom_variables ) ) : ?>
-                    <table class="wp-list-table widefat fixed striped" style="margin-top: 10px;">
-                        <thead>
-                            <tr>
-                                <th style="width: 30%;"><?php esc_html_e( 'Name', 'scripts-and-pixels-datalayer-manager' ); ?></th>
-                                <th style="width: 40%;"><?php esc_html_e( 'Value', 'scripts-and-pixels-datalayer-manager' ); ?></th>
-                                <th style="width: 20%;"><?php esc_html_e( 'Type', 'scripts-and-pixels-datalayer-manager' ); ?></th>
-                                <th style="width: 10%;"><?php esc_html_e( 'Actions', 'scripts-and-pixels-datalayer-manager' ); ?></th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <?php $index = 0; ?>
-                            <?php foreach ( $filtered_custom_variables as $key => $value ) : ?>
-                                <?php
-                                $type = $this->get_value_type( $value );
-                                $display_value = $this->format_value_for_edit( $value, $type );
-                                ?>
-                                <tr class="datalayer-variable-row">
-                                    <td>
-                                        <input type="text" name="datalayer_variables[<?php echo esc_attr( $index ); ?>][key]" value="<?php echo esc_attr( $key ); ?>" class="regular-text datalayer-variable-key" pattern="[A-Za-z0-9_]+" required />
-                                    </td>
-                                    <td>
-                                        <input type="text" name="datalayer_variables[<?php echo esc_attr( $index ); ?>][value]" value="<?php echo esc_attr( $display_value ); ?>" class="regular-text" required />
-                                    </td>
-                                    <td>
-                                        <select name="datalayer_variables[<?php echo esc_attr( $index ); ?>][type]" class="regular-text">
-                                            <option value="string" <?php selected( $type, 'string' ); ?>><?php esc_html_e( 'String', 'scripts-and-pixels-datalayer-manager' ); ?></option>
-                                            <option value="number" <?php selected( $type, 'number' ); ?>><?php esc_html_e( 'Number', 'scripts-and-pixels-datalayer-manager' ); ?></option>
-                                            <option value="boolean" <?php selected( $type, 'boolean' ); ?>><?php esc_html_e( 'Boolean', 'scripts-and-pixels-datalayer-manager' ); ?></option>
-                                        </select>
-                                    </td>
-                                    <td>
-                                        <button type="button" class="button button-small remove-variable-row"><?php esc_html_e( 'Remove', 'scripts-and-pixels-datalayer-manager' ); ?></button>
-                                    </td>
-                                </tr>
-                                <?php $index++; ?>
-                            <?php endforeach; ?>
-                        </tbody>
-                    </table>
-                <?php else : ?>
-                    <p class="description" style="margin-top: 10px;">
-                        <?php esc_html_e( 'No custom variables added yet. Click "Add Variable" to create one.', 'scripts-and-pixels-datalayer-manager' ); ?>
-                    </p>
-                <?php endif; ?>
-            </div>
-            
-                <p style="margin-top: 15px;">
-                    <button type="button" class="button button-secondary" id="add-datalayer-variable">
-                        <?php esc_html_e( '+ Add Variable', 'scripts-and-pixels-datalayer-manager' ); ?>
-                    </button>
-                </p>
-                
-                <input type="hidden" id="datalayer-auto-detected-keys" value="<?php echo esc_attr( wp_json_encode( $auto_detected_keys ) ); ?>" />
-            
-                <?php
-                // Inline script via wp_add_inline_script for compliance.
-                $reserved_msg = esc_js( __( 'This key is reserved for auto-detected variables and cannot be used.', 'scripts-and-pixels-datalayer-manager' ) );
-                $l_name       = esc_js( __( 'Name', 'scripts-and-pixels-datalayer-manager' ) );
-                $l_value      = esc_js( __( 'Value', 'scripts-and-pixels-datalayer-manager' ) );
-                $l_type       = esc_js( __( 'Type', 'scripts-and-pixels-datalayer-manager' ) );
-                $l_actions    = esc_js( __( 'Actions', 'scripts-and-pixels-datalayer-manager' ) );
-                $l_string     = esc_js( __( 'String', 'scripts-and-pixels-datalayer-manager' ) );
-                $l_number     = esc_js( __( 'Number', 'scripts-and-pixels-datalayer-manager' ) );
-                $l_boolean    = esc_js( __( 'Boolean', 'scripts-and-pixels-datalayer-manager' ) );
-                $l_remove     = esc_js( __( 'Remove', 'scripts-and-pixels-datalayer-manager' ) );
-                $meta_box_js  = "(function(\$){\$(document).ready(function(){var autoDetectedKeys=[];try{autoDetectedKeys=JSON.parse(\$('#datalayer-auto-detected-keys').val()||'[]');}catch(e){autoDetectedKeys=[];}
-function validateVariableKey(key,inputElement){if(autoDetectedKeys.indexOf(key)!==-1){inputElement.css('border-color','#dc3232');var e=inputElement.siblings('.datalayer-error-message');if(e.length===0){inputElement.after('<span class=\"datalayer-error-message\" style=\"color:#dc3232;font-size:11px;display:block;margin-top:3px;\">" . $reserved_msg . "</span>');}return false;}else{inputElement.css('border-color','');inputElement.siblings('.datalayer-error-message').remove();return true;}}
-\$('#add-datalayer-variable').on('click',function(){var i=Date.now(),tbody=\$('#datalayer-custom-variables tbody');if(tbody.length===0){var tbl='<table class=\"wp-list-table widefat fixed striped\" style=\"margin-top:10px;\"><thead><tr><th style=\"width:30%;\">" . $l_name . "</th><th style=\"width:40%;\">" . $l_value . "</th><th style=\"width:20%;\">" . $l_type . "</th><th style=\"width:10%;\">" . $l_actions . "</th></tr></thead><tbody></tbody></table>';\$('#datalayer-custom-variables').html(tbl);tbody=\$('#datalayer-custom-variables tbody');}
-var row='<tr class=\"datalayer-variable-row\"><td><input type=\"text\" name=\"datalayer_variables['+i+'][key]\" value=\"\" class=\"regular-text datalayer-variable-key\" pattern=\"[A-Za-z0-9_]+\" required /></td><td><input type=\"text\" name=\"datalayer_variables['+i+'][value]\" value=\"\" class=\"regular-text\" required /></td><td><select name=\"datalayer_variables['+i+'][type]\" class=\"regular-text\"><option value=\"string\">" . $l_string . "</option><option value=\"number\">" . $l_number . "</option><option value=\"boolean\">" . $l_boolean . "</option></select></td><td><button type=\"button\" class=\"button button-small remove-variable-row\">" . $l_remove . "</button></td></tr>';tbody.append(row);});
-\$(document).on('blur','.datalayer-variable-key',function(){var k=\$(this).val().trim();if(k){validateVariableKey(k,\$(this));}});
-\$(document).on('click','.remove-variable-row',function(){\$(this).closest('.datalayer-variable-row').remove();});});})(jQuery);";
-                wp_add_inline_script( 'datalayer-manager-meta-box', $meta_box_js );
-                ?>
-                <?php endif; // End premium check. ?>
-            </div>
-            <?php endif; // End WP.org check: hide Custom Variables section when DATALAYER_MANAGER_FREE_VERSION. ?>
+            <?php if ( class_exists( 'DataLayer_Manager_Custom_Variables' ) ) : ?>
+                <?php DataLayer_Manager_Custom_Variables::render_section( $this, $post ); ?>
+            <?php endif; ?>
         </div>
         <?php
     }
@@ -1509,136 +1377,20 @@ var row='<tr class=\"datalayer-variable-row\"><td><input type=\"text\" name=\"da
             return;
         }
 
-        // Only save custom variables if premium is active.
-        if ( ! $this->is_premium_active() ) {
-            return;
+        // Save custom variables (Pro only; class not present in WP.org build).
+        if ( class_exists( 'DataLayer_Manager_Custom_Variables' ) ) {
+            DataLayer_Manager_Custom_Variables::save_section( $this, $post_id, $post );
         }
-
-        // Check post type.
-        $allowed_types = array( 'post', 'page' );
-        
-        // Add WooCommerce product if WooCommerce is active.
-        if ( $this->is_woocommerce_active() ) {
-            $allowed_types[] = 'product';
-        }
-        
-        // Get all public custom post types.
-        $custom_post_types = get_post_types(
-            array(
-                'public'   => true,
-                '_builtin' => false,
-            ),
-            'names'
-        );
-        
-        if ( ! empty( $custom_post_types ) ) {
-            $allowed_types = array_merge( $allowed_types, $custom_post_types );
-        }
-        
-        // Allow filtering to add/remove post types.
-        $allowed_types = apply_filters( 'datalayer_manager_meta_box_post_types', $allowed_types );
-        
-        if ( ! in_array( $post->post_type, $allowed_types, true ) ) {
-            return;
-        }
-
-        // Get auto-detected variable keys (to prevent overriding).
-        $auto_detected_keys = $this->get_auto_detected_variable_keys( $post );
-
-        // Process custom variables.
-        $custom_variables = array();
-        
-        if ( isset( $_POST['datalayer_variables'] ) && is_array( $_POST['datalayer_variables'] ) ) {
-            // Unslash and sanitize the POST array before processing.
-            $datalayer_variables = wp_unslash( $_POST['datalayer_variables'] ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Will sanitize individual values in loop.
-            
-            foreach ( $datalayer_variables as $var ) {
-                $key = isset( $var['key'] ) ? trim( sanitize_text_field( wp_unslash( $var['key'] ) ) ) : '';
-                $value = isset( $var['value'] ) ? trim( sanitize_text_field( wp_unslash( $var['value'] ) ) ) : '';
-                $type = isset( $var['type'] ) ? sanitize_text_field( wp_unslash( $var['type'] ) ) : 'string';
-
-                // Skip if key is empty.
-                if ( empty( $key ) ) {
-                    continue;
-                }
-
-                // Validate key format.
-                if ( ! preg_match( '/^[A-Za-z0-9_]+$/', $key ) ) {
-                    continue;
-                }
-
-                // Prevent using auto-detected variable keys.
-                if ( in_array( $key, $auto_detected_keys, true ) ) {
-                    continue; // Skip this variable - it's reserved.
-                }
-
-                // Convert value by type.
-                $converted_value = $this->convert_value_by_type( $value, $type );
-                if ( null !== $converted_value ) {
-                    $custom_variables[ $key ] = $converted_value;
-                }
-            }
-        }
-
-        // Save custom variables.
-        if ( ! empty( $custom_variables ) ) {
-            update_post_meta( $post_id, '_datalayer_manager_custom_variables', $custom_variables );
-        } else {
-            delete_post_meta( $post_id, '_datalayer_manager_custom_variables' );
-        }
-    }
-
-    /**
-     * Convert value by type.
-     *
-     * @param string $value Value to convert.
-     * @param string $type  Target type.
-     * @return mixed Converted value or null if invalid.
-     */
-    private function convert_value_by_type( $value, $type ) {
-        switch ( $type ) {
-            case 'number':
-                if ( ! is_numeric( $value ) ) {
-                    return null;
-                }
-                return strpos( $value, '.' ) !== false ? (float) $value : (int) $value;
-
-            case 'boolean':
-                $lower_value = strtolower( trim( $value ) );
-                if ( 'true' === $lower_value || '1' === $lower_value || 'yes' === $lower_value ) {
-                    return true;
-                } elseif ( 'false' === $lower_value || '0' === $lower_value || 'no' === $lower_value || '' === $lower_value ) {
-                    return false;
-                }
-                return null;
-
-            case 'string':
-            default:
-                return $value;
-        }
-    }
-
-    /**
-     * Format value for editing (convert back to string for form input).
-     *
-     * @param mixed  $value Value to format.
-     * @param string $type  Type of value.
-     * @return string Formatted value for form input.
-     */
-    private function format_value_for_edit( $value, $type ) {
-        if ( 'boolean' === $type ) {
-            return $value ? 'true' : 'false';
-        }
-        return (string) $value;
     }
 
     /**
      * Get auto-detected variable keys for a specific post (uneditable/reserved).
+     * Public so DataLayer_Manager_Custom_Variables can use it when present.
      *
      * @param WP_Post $post Post object.
      * @return array Array of reserved variable keys.
      */
-    private function get_auto_detected_variable_keys( $post ) {
+    public function get_auto_detected_variable_keys( $post ) {
         $variables = $this->get_auto_detected_variables_preview( $post );
         return array_keys( $variables );
     }
@@ -1772,11 +1524,10 @@ var row='<tr class=\"datalayer-variable-row\"><td><input type=\"text\" name=\"da
      * @return array Custom variables array.
      */
     private function get_custom_variables( $post_id ) {
-        $custom_variables = get_post_meta( $post_id, '_datalayer_manager_custom_variables', true );
-        if ( ! is_array( $custom_variables ) ) {
+        if ( ! class_exists( 'DataLayer_Manager_Custom_Variables' ) ) {
             return array();
         }
-        return $custom_variables;
+        return DataLayer_Manager_Custom_Variables::get_for_post( $post_id );
     }
 
     /**

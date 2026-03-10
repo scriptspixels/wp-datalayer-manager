@@ -57,6 +57,10 @@ fi
 echo "Removing premium/license functionality..."
 rm -f "$BUILD_DIR/$WP_ORG_SLUG/includes/class-license-manager.php"
 
+# Remove custom variables class (Guideline 5: no locked/trialware features in WP.org build)
+echo "Removing custom variables (Pro-only) for WP.org compliance..."
+rm -f "$BUILD_DIR/$WP_ORG_SLUG/includes/class-datalayer-manager-custom-variables.php"
+
 # Remove development files
 echo "Cleaning development files..."
 find "$BUILD_DIR/$WP_ORG_SLUG" -name ".DS_Store" -delete
@@ -72,6 +76,10 @@ if grep -q "DATALAYER_MANAGER_FREE_VERSION" "$MAIN_FILE"; then
 else
     sed -i.bak "s/define( 'DATALAYER_MANAGER_PLUGIN_FILE'/define( 'DATALAYER_MANAGER_FREE_VERSION', true );\ndefine( 'DATALAYER_MANAGER_PLUGIN_FILE'/" "$MAIN_FILE"
 fi
+rm -f "$MAIN_FILE.bak"
+
+# Free build description: do not advertise custom variables (not in WP.org build).
+sed -i.bak "s/Custom variables per page\/post. //" "$MAIN_FILE"
 rm -f "$MAIN_FILE.bak"
 
 # Create zip file

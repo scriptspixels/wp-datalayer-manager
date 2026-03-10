@@ -107,6 +107,12 @@ if ( ! DATALAYER_MANAGER_FREE_VERSION && file_exists( $datalayer_manager_license
     require_once $datalayer_manager_license_file;
 }
 
+// Custom variables (Pro only). Not included in WP.org build — no locked features in free plugin.
+$datalayer_manager_custom_vars_file = DATALAYER_MANAGER_PLUGIN_DIR . 'includes/class-datalayer-manager-custom-variables.php';
+if ( ! DATALAYER_MANAGER_FREE_VERSION && file_exists( $datalayer_manager_custom_vars_file ) ) {
+    require_once $datalayer_manager_custom_vars_file;
+}
+
 require_once DATALAYER_MANAGER_PLUGIN_DIR . 'includes/class-datalayer-manager.php';
 
 /**

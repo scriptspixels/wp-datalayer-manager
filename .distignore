@@ -1,0 +1,66 @@
+# Files and directories to exclude when preparing the plugin for WordPress.org SVN.
+# Do not upload these to https://plugins.svn.wordpress.org/scripts-and-pixels-datalayer-manager
+#
+# Use: copy only files NOT matching these paths into your SVN trunk (or use
+# build-wp-org.sh and sync the built folder into trunk).
+
+# Version control and repo metadata
+.git
+.gitignore
+.distignore
+
+# Build and tooling
+build-wp-org.sh
+build-plugin.sh
+build/
+dist/
+release/
+*.zip
+*.tar.gz
+
+# Dependencies (if any added later)
+node_modules/
+vendor/
+composer.phar
+
+# Documentation (WP.org uses readme.txt only)
+README.md
+FEATURES.md
+CHANGELOG.md
+GITHUB-BEST-PRACTICES.md
+SECURITY-COMPLIANCE.md
+PRE-UPLOAD-CHECKLIST.md
+WORDPRESS-ORG-SETUP.md
+LICENSE-API-SETUP.md
+
+# IDE and OS
+.DS_Store
+.DS_Store?
+._*
+.Trashes
+Thumbs.db
+desktop.ini
+.vscode/
+.idea/
+*.sublime-*
+*.code-workspace
+*.swp
+*.swo
+*~
+
+# Environment and local config
+.env
+.env.*
+wp-config.php
+local-config.php
+
+# Logs and temp
+*.log
+*.cache
+*.tmp
+*.temp
+*.bak
+*.backup
+.phpunit.result.cache
+coverage/
+.nyc_output/

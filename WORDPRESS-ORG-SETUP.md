@@ -105,6 +105,10 @@ To test the free version locally before building:
    - Upgrade prompts should be informational only
    - No "Activate License" links
 
+## Uploading to WordPress.org (SVN)
+
+After the plugin is **accepted**, use Subversion to upload. See **[SVN-UPLOAD.md](SVN-UPLOAD.md)** for step-by-step instructions (checkout, prepare trunk from build, commit, tag). A **.distignore** file in the repo lists what to exclude from SVN (e.g. `.git`, build scripts, dev docs).
+
 ## WordPress.org Submission Checklist
 
 Before submitting to WordPress.org:

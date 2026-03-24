@@ -17,6 +17,81 @@ if ( ! defined( 'ABSPATH' ) ) {
 class DataLayer_Manager_Custom_Variables {
 
     /**
+     * Register/enqueue the meta box script handle early so wp_add_inline_script() in render_section works.
+     * The main plugin used global $post_type, which is often empty on post-new.php — the handle was never
+     * enqueued, so inline script never printed and custom variables could not be added or saved reliably.
+     *
+     * @param string $hook Current admin page hook.
+     */
+    public static function ensure_meta_box_scripts( $hook ) {
+        if ( ! in_array( $hook, array( 'post.php', 'post-new.php' ), true ) ) {
+            return;
+        }
+
+        $post_type = self::get_edited_post_type_for_screen( $hook );
+        if ( ! in_array( $post_type, self::get_allowed_meta_box_post_types(), true ) ) {
+            return;
+        }
+
+        wp_register_script( 'datalayer-manager-meta-box', '', array( 'jquery' ), DATALAYER_MANAGER_VERSION, true );
+        wp_enqueue_script( 'datalayer-manager-meta-box', '', array( 'jquery' ), DATALAYER_MANAGER_VERSION, true );
+    }
+
+    /**
+     * Resolve post type on post edit screens (global $post_type is not always set when admin_enqueue_scripts runs).
+     *
+     * @param string $hook Current admin page hook.
+     * @return string Post type slug.
+     */
+    private static function get_edited_post_type_for_screen( $hook ) {
+        if ( function_exists( 'get_current_screen' ) ) {
+            $screen = get_current_screen();
+            if ( $screen && ! empty( $screen->post_type ) ) {
+                return $screen->post_type;
+            }
+        }
+
+        global $post_type;
+        if ( ! empty( $post_type ) ) {
+            return $post_type;
+        }
+
+        if ( 'post-new.php' === $hook && isset( $_GET['post_type'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+            return sanitize_key( wp_unslash( $_GET['post_type'] ) );
+        }
+
+        if ( 'post.php' === $hook && isset( $_GET['post'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+            $post_id = (int) $_GET['post'];
+            if ( $post_id > 0 ) {
+                $ptype = get_post_type( $post_id );
+                if ( $ptype ) {
+                    return $ptype;
+                }
+            }
+        }
+
+        return 'post';
+    }
+
+    /**
+     * Post types that show the DataLayer meta box (must match DataLayer_Manager::register_meta_boxes).
+     *
+     * @return string[] Post type names.
+     */
+    private static function get_allowed_meta_box_post_types() {
+        $allowed_types = array( 'post', 'page' );
+        if ( class_exists( 'WooCommerce' ) ) {
+            $allowed_types[] = 'product';
+        }
+        $custom_post_types = get_post_types( array( 'public' => true, '_builtin' => false ), 'names' );
+        if ( ! empty( $custom_post_types ) ) {
+            $allowed_types = array_merge( $allowed_types, $custom_post_types );
+        }
+
+        return array_unique( apply_filters( 'datalayer_manager_meta_box_post_types', $allowed_types ) );
+    }
+
+    /**
      * Render the Custom Variables section in the meta box.
      *
      * @param DataLayer_Manager $main Main plugin instance.
@@ -64,6 +139,7 @@ class DataLayer_Manager_Custom_Variables {
                     </p>
                 </div>
             <?php else : ?>
+                <input type="hidden" name="datalayer_custom_variables_intent" value="1" />
             <div id="datalayer-custom-variables">
                 <?php if ( ! empty( $filtered_custom_variables ) ) : ?>
                     <table class="wp-list-table widefat fixed striped" style="margin-top: 10px;">
@@ -153,15 +229,18 @@ var row='<tr class=\"datalayer-variable-row\"><td><input type=\"text\" name=\"da
         if ( ! $main->is_premium_active() ) {
             return;
         }
-        $allowed_types = array( 'post', 'page' );
-        if ( $main->is_woocommerce_active() ) {
-            $allowed_types[] = 'product';
+        if ( wp_is_post_revision( $post_id ) ) {
+            return;
         }
-        $custom_post_types = get_post_types( array( 'public' => true, '_builtin' => false ), 'names' );
-        if ( ! empty( $custom_post_types ) ) {
-            $allowed_types = array_merge( $allowed_types, $custom_post_types );
+        if ( ! $post instanceof WP_Post ) {
+            return;
         }
-        $allowed_types = apply_filters( 'datalayer_manager_meta_box_post_types', $allowed_types );
+        // Only run when this meta box was part of the submitted form (avoids clearing meta on partial saves).
+        if ( ! isset( $_POST['datalayer_custom_variables_intent'] ) ) {
+            return;
+        }
+
+        $allowed_types = self::get_allowed_meta_box_post_types();
         if ( ! in_array( $post->post_type, $allowed_types, true ) ) {
             return;
         }
@@ -253,3 +332,5 @@ var row='<tr class=\"datalayer-variable-row\"><td><input type=\"text\" name=\"da
         }
     }
 }
+
+add_action( 'admin_enqueue_scripts', array( 'DataLayer_Manager_Custom_Variables', 'ensure_meta_box_scripts' ), 5 );

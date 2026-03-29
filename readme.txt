@@ -3,7 +3,7 @@ Tags: datalayer, google-tag-manager, analytics, tracking, woocommerce
 Requires at least: 5.0
 Tested up to: 6.9
 Requires PHP: 7.4
-Stable tag: 1.0.0
+Stable tag: 1.0.1
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -108,6 +108,9 @@ Open your browser's Developer Tools (F12), go to the Console tab, and type `data
 
 == Changelog ==
 
+= 1.0.1 =
+* Readme updates for the WordPress.org plugin directory.
+
 = 1.0.0 =
 * Initial release
 * Automatic detection of WordPress variables
@@ -116,6 +119,9 @@ Open your browser's Developer Tools (F12), go to the Console tab, and type `data
 * Meta box for viewing auto-detected variables
 
 == Upgrade Notice ==
+
+= 1.0.1 =
+Readme updates only; no functional changes.
 
 = 1.0.0 =
 Initial release. Automatically detects WordPress and WooCommerce dataLayer variables with zero configuration.

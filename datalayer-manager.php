@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Scripts + Pixels DataLayer Manager
  * Description: Automatically detects WordPress context and injects dataLayer variables for analytics tools (GA4/GTM). Custom variables per page/post. No coding required.
- * Version: 1.0.0
+ * Version: 1.0.1
  * Author: Scripts + Pixels
  * Author URI: https://scriptsandpixels.studio
  * License: GPL v2 or later
@@ -21,7 +21,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Define plugin constants.
-define( 'DATALAYER_MANAGER_VERSION', '1.0.0' );
+define( 'DATALAYER_MANAGER_VERSION', '1.0.1' );
 define( 'DATALAYER_MANAGER_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 define( 'DATALAYER_MANAGER_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
 define( 'DATALAYER_MANAGER_PLUGIN_FILE', __FILE__ );

@@ -1,5 +1,4 @@
 === Scripts + Pixels DataLayer Manager ===
-Contributors: scriptsandpixels
 Tags: datalayer, google-tag-manager, analytics, tracking, woocommerce
 Requires at least: 5.0
 Tested up to: 6.9

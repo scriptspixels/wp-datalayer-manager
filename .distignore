@@ -9,6 +9,9 @@
 .gitignore
 .distignore
 
+# WordPress.org plugin directory only (commit to SVN assets/, not trunk zip)
+wp-assets/
+
 # Build and tooling
 build-wp-org.sh
 build-plugin.sh

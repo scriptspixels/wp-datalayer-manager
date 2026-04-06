@@ -48,6 +48,9 @@ cp "$PLUGIN_DIR/uninstall.php" "$BUILD_DIR/$PLUGIN_NAME/"
 cp -r "$PLUGIN_DIR/includes" "$BUILD_DIR/$PLUGIN_NAME/"
 cp -r "$PLUGIN_DIR/languages" "$BUILD_DIR/$PLUGIN_NAME/"
 
+# wp-assets/ is for WordPress.org SVN assets/ (banners, icons), not distribution zips
+rm -rf "$BUILD_DIR/$PLUGIN_NAME/wp-assets"
+
 # Optional documentation (uncomment if you want to include)
 # cp "$PLUGIN_DIR/README.md" "$BUILD_DIR/$PLUGIN_NAME/"
 # cp "$PLUGIN_DIR/CHANGELOG.md" "$BUILD_DIR/$PLUGIN_NAME/"
@@ -61,7 +64,7 @@ find "$BUILD_DIR/$PLUGIN_NAME" -name ".git*" -delete
 # Create zip file
 echo "Creating zip archive..."
 cd "$BUILD_DIR"
-zip -r "$ZIP_NAME" "$PLUGIN_NAME" -x "*.DS_Store" "*.log" ".git*" > /dev/null
+zip -r "$ZIP_NAME" "$PLUGIN_NAME" -x "*.DS_Store" "*.log" ".git*" "*/wp-assets/*" > /dev/null
 
 # Move zip to plugin directory
 mv "$ZIP_NAME" "$PLUGIN_DIR/"

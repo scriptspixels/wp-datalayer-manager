@@ -47,6 +47,9 @@ cp "$PLUGIN_DIR/uninstall.php" "$BUILD_DIR/$WP_ORG_SLUG/"
 cp -r "$PLUGIN_DIR/includes" "$BUILD_DIR/$WP_ORG_SLUG/"
 cp -r "$PLUGIN_DIR/languages" "$BUILD_DIR/$WP_ORG_SLUG/"
 
+# wp-assets/ is for WordPress.org SVN assets/ (banners, icons), not the plugin zip
+rm -rf "$BUILD_DIR/$WP_ORG_SLUG/wp-assets"
+
 if [ -f "$PLUGIN_DIR/readme.txt" ]; then
     cp "$PLUGIN_DIR/readme.txt" "$BUILD_DIR/$WP_ORG_SLUG/"
 else
@@ -85,7 +88,7 @@ rm -f "$MAIN_FILE.bak"
 # Create zip file
 echo "Creating zip archive..."
 cd "$BUILD_DIR"
-zip -r "$ZIP_NAME" "$WP_ORG_SLUG" -x "*.DS_Store" "*.log" ".git*" "*.bak" > /dev/null
+zip -r "$ZIP_NAME" "$WP_ORG_SLUG" -x "*.DS_Store" "*.log" ".git*" "*.bak" "*/wp-assets/*" > /dev/null
 
 mv "$ZIP_NAME" "$PLUGIN_DIR/"
 rm -rf "$BUILD_DIR"
